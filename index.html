@@ -343,6 +343,40 @@ button,input{font-family:inherit}
 .fsec small{font:500 12px var(--body);letter-spacing:0}
 .steps4 span{font:700 10px var(--body);letter-spacing:.08em}
 .eyebrow{font-family:var(--body);font-weight:700;letter-spacing:.14em}
+
+/* v19: list cards, set point, floor picker, next bar */
+.mcard.mc2{cursor:pointer;align-items:center}
+.mcard.mc2 .tx{align-self:stretch}
+.mcard.mc2 .acts{margin-top:auto;padding-top:4px}
+.mcard.mc2 .acts .lvl{margin-left:0}
+.go2{flex:none;align-self:center;display:flex;flex-direction:column;align-items:center;gap:0;padding:6px 2px 6px 6px;margin-right:-2px;border:0;background:transparent;color:var(--accent-text);cursor:pointer;font:800 9px/1 var(--body);letter-spacing:1.2px}
+.go2 span{opacity:.85}
+.go2 svg{display:block;margin-top:1px}
+.tabs .scan{flex:1;min-height:58px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px;padding:0 0 7px;border:0;background:transparent;color:var(--tab-fg);font:700 9px var(--label);letter-spacing:1px;cursor:pointer}
+.tabs .scan span{width:50px;height:50px;margin-top:-20px;border-radius:50%;background:var(--accent);color:#FFFFFF;display:flex;align-items:center;justify-content:center;border:3px solid var(--tab-bg);box-shadow:0 0 0 1.5px var(--accent)}
+.tabs .scan[aria-pressed="true"]{color:var(--accent-text)}
+.tabs .scan[aria-pressed="true"] span{background:#FFFFFF;color:var(--accent)}
+.mapctl button.spb{background:var(--accent);border-color:var(--accent);color:#FFFFFF;display:flex;align-items:center;justify-content:center}
+.mapctl button.spb.on{background:#FFFFFF;color:var(--accent)}
+.mapctl button.on{border-color:var(--accent);color:var(--accent-text)}
+.mapctl button{display:flex;align-items:center;justify-content:center}
+.mapctl button:last-child{margin-top:6px}
+.floorpick{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.floorpick>span{font:800 9.5px var(--label);letter-spacing:1.4px;text-transform:uppercase;color:var(--accent-text)}
+.floorpick .seg button{min-width:40px;min-height:34px;font:800 15px var(--body)}
+.floorpick .seg button[aria-pressed="true"]{background:var(--accent);color:#FFFFFF;font-weight:900;transform:scale(1.04)}
+.nextbar{padding-top:5px;padding-bottom:5px}
+.nextbar button{min-height:34px;padding:0 12px;gap:12px;font:900 13.5px var(--body);letter-spacing:3px;border-width:1.5px}
+.nextbar b{font-weight:900}
+.nextbar b span{font-weight:900}
+.nextbar img{width:24px;height:24px}
+
+/* v19: home header brand */
+header.top.plain{gap:10px}
+header.top.plain .emb.lg{width:46px;height:46px;flex:none;animation:none;transform:none;pointer-events:none}
+.brand{flex:1 1 auto;min-width:0;gap:3px}
+.brand b{font:900 25px/1 var(--body);letter-spacing:-.3px;white-space:nowrap}
+.brand span{font:700 9.5px/1 var(--body);letter-spacing:4.2px;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -786,7 +820,10 @@ function focusOn(x,y,z){S.zoom=z||2.4;S.pan=[x-(VB[0]+VB[2]/2),y-(VB[1]+VB[3]/2)
 function focusRoute(m,level){const r=route(S.pos,{f:m.f,x:m.x,y:m.y,room:m.room});level=level==null?S.pos.f:level;const P=r?r.pts.filter(p=>p.f===level):[];if(level===m.f)P.push({x:m.x,y:m.y});if(!P.length){focusOn(S.pos.x,S.pos.y-6,1.6);return;}
  const xs=P.map(p=>p.x),ys=P.map(p=>p.y);const x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);focusOn((x0+x1)/2,(y0+y1)/2-4,Math.max(1,Math.min(4,VB[2]/(x1-x0+20),VB[3]/(y1-y0+30))));}
 const DC={};function distFromPos(m){const k=S.pos.id+'|'+S.pos.x+'|'+m.code;if(!(k in DC)){const r=route(S.pos,{f:m.f,x:m.x,y:m.y,room:m.room});DC[k]=r?r.m:999;}return DC[k];}
-function mcard(m,o){o=o||{};const det=o.flow?`<button class="cb ic" type="button" data-act="pick" data-c="${m.code}" aria-label="Ver detalhe da máquina">${ic('list',17,2.2)}</button>`:`<a class="cb ic" href="#${m.slug}" aria-label="Ver detalhe da máquina">${ic('list',17,2.2)}</a>`;
+function mcard(m,o){o=o||{};const open=o.flow?`data-act="pick" data-c="${m.code}"`:`data-act="mopen" data-s="${m.slug}"`;
+ return `<div class="mcard mc2${o.sm?' sm':''}" ${open} role="link" tabindex="0" aria-label="Ver ${esc(m.nameN)}"><span class="pic">${pic(m)}</span><div class="tx"><span class="br">${esc(m.brand)}</span><span class="nm">${esc(m.nameN)}</span><span class="mt">${esc(o.meta||(RNAME(m.room)+' · '+m.code+' · Fila '+m.row))}</span>
+  <div class="acts">${lvl(m)}</div></div><button class="go2" type="button" data-act="go" data-c="${m.code}" aria-label="Ir para ${esc(m.nameN)}"><span>GO</span><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>`;}
+function mcardOld(m,o){o=o||{};const det=o.flow?`<button class="cb ic" type="button" data-act="pick" data-c="${m.code}" aria-label="Ver detalhe da máquina">${ic('list',17,2.2)}</button>`:`<a class="cb ic" href="#${m.slug}" aria-label="Ver detalhe da máquina">${ic('list',17,2.2)}</a>`;
  return `<div class="mcard${o.sm?' sm':''}"><a class="pic" href="#${m.slug}" ${o.flow?`data-act="pick" data-c="${m.code}"`:''} aria-label="Ver ${esc(m.nameN)}">${pic(m)}</a><div class="tx"><span class="br">${esc(m.brand)}</span><span class="nm">${esc(m.nameN)}</span><span class="mt">${esc(o.meta||(RNAME(m.room)+' · '+m.code+' · Fila '+m.row))}</span>
   <div class="acts"><button class="cb" type="button" data-act="go" data-c="${m.code}">GO</button>${det}${lvl(m)}</div></div></div>`;}
 
@@ -952,7 +989,8 @@ function vMapa(){
   const st=ROUTE?steps(ROUTE):null;
   const sel=S.sel?BYCODE[S.sel]:null;
   let sheet='';
-  if(t&&S.nav&&ROUTE){
+  if(S.setPoint)sheet=`<div class="card mapsheet acc" style="gap:8px;border-color:var(--accent)"><b style="font-size:15px">${ic('pin',16)} Toca no mapa onde estás agora</b><span class="muted" style="font-size:12px">Numa sala, num corredor ou junto a uma máquina. Mais tarde isto passa a ser automático (QR, NFC, Wi-Fi ou Bluetooth).</span><div class="btn-row"><a class="btn ghost sm" href="#ler">${ic('qr',15)} Ler QR / NFC</a><button class="btn ghost sm" type="button" data-act="setpoint">Cancelar</button></div></div>`;
+  else if(t&&S.nav&&ROUTE){
     const next=S.fromTreino?orderTreino().find(c=>!S.done[c]&&c!==t.code):null;
     sheet=`<div class="card mapsheet">${S.flow&&!S.fromTreino?stepper(3):''}<div class="eta"><span style="font:800 18px var(--display);text-transform:uppercase">${esc(t.nameN)}</span><b>≈ ${ROUTE.m} m · ${ROUTE.min} min</b></div>
      <span class="muted" style="font-size:13px">${esc(t.brand)} · ${t.code} · ${esc(RNAME(t.room))} · Fila ${t.row} · ${FLOORNAME[t.f]} · <a href="#${t.slug}" style="color:var(--accent-text)">ficha</a></span>
@@ -964,12 +1002,11 @@ function vMapa(){
      <div class="btn-row"><button class="btn" type="button" data-act="go" data-c="${sel.code}">Levar-me lá</button><a class="btn ghost" href="#${sel.slug}">Ficha</a></div></div>`;
   }else if(S.roomSel){const r=S.roomSel;const n=M.filter(m=>m.room===r).length;
     sheet=`<div class="card mapsheet"><h3>${esc(RNAME(r))}</h3><span class="muted" style="font-size:13px">${esc((PLAN.functions||{})[r]||'')} · ${n} máquinas</span><div class="btn-row"><button class="btn" type="button" data-act="room-list" data-r="${r}">Ver máquinas</button><button class="btn ghost" type="button" data-act="room-clear">Fechar</button></div></div>`;
-  }else if(S.setPoint)sheet=`<div class="card mapsheet acc" style="gap:8px;border-color:var(--accent)"><b style="font-size:15px">${ic('pin',16)} Toca no mapa onde estás agora</b><span class="muted" style="font-size:12px">Numa sala, num corredor ou junto a uma máquina. Mais tarde isto passa a ser automático (QR, NFC, Wi-Fi ou Bluetooth).</span><button class="btn ghost sm" type="button" data-act="setpoint">Cancelar</button></div>`;
-  else sheet=`<div class="card mapsheet" style="gap:8px;flex-direction:row;align-items:center">${posLine()}<button class="cb" type="button" data-act="setpoint" style="margin-left:auto;flex:none">${ic('pin',15,2.4)} Set point</button></div>`;
-  return `<div class="scr">${top('Mapa','',`<button class="icon-btn${S.roomsOpen?' acc':''}" type="button" data-act="rooms-toggle" aria-label="Salas" aria-expanded="${!!S.roomsOpen}" style="width:40px;height:40px">${ic('rooms',20)}</button><div class="seg" role="group" aria-label="Piso">${[-1,0,1].map(f=>`<button type="button" data-act="floor" data-v="${f}" aria-pressed="${S.floor===f}">${f===-1?'−1':f}</button>`).join('')}</div>`)}
+  }else sheet=`<div class="card mapsheet" style="gap:8px">${posLine()}</div>`;
+  return `<div class="scr">${top('Mapa','',`<div class="floorpick"><span>Escolhe o piso</span><div class="seg" role="group" aria-label="Escolhe o piso">${[-1,0,1].map(f=>`<button type="button" data-act="floor" data-v="${f}" aria-pressed="${S.floor===f}">${f===-1?'−1':f}</button>`).join('')}</div></div>`)}
    <div class="mapwrap" id="mapwrap">${mapSVG(S.floor,{route:ROUTE})}
     <div class="maplegend">${['free','go','busy'].map(k=>`<span><i style="background:var(--st-${k})"></i>${STN[k]}</span>`).join('')}${S.zoom<2.2?'<span class="muted">· aproxima +</span>':''}</div>
-    <div class="mapctl"><button type="button" data-act="zin" aria-label="Aproximar">+</button><button type="button" data-act="zout" aria-label="Afastar">−</button><button type="button" data-act="zfit" aria-label="Ver tudo">⤢</button></div></div>
+    <div class="mapctl"><button type="button" class="spb${S.setPoint?' on':''}" data-act="setpoint" aria-pressed="${!!S.setPoint}" aria-label="Set point: marcar onde estás">${ic('pin',20,2.4)}</button><button type="button" data-act="zin" aria-label="Aproximar">+</button><button type="button" data-act="zout" aria-label="Afastar">−</button><button type="button" data-act="zfit" aria-label="Ver tudo">⤢</button><button type="button" class="${S.roomsOpen?'on':''}" data-act="rooms-toggle" aria-label="Salas" aria-expanded="${!!S.roomsOpen}">${ic('rooms',19)}</button></div></div>
    ${sheet}${popHTML()}${roomsHTML()}</div>`;}
 function roomsHTML(){if(!S.roomsOpen)return '';
  return `<div class="mappop" role="dialog" aria-label="Salas" style="max-height:62%;overflow:auto;gap:8px"><button class="x" type="button" data-act="rooms-toggle" aria-label="Fechar">${ic('x',20)}</button>
@@ -1160,6 +1197,7 @@ const GUIDE_EN=[
 ];
 const HOW_EN={free:["Set the bench and check the plates or dumbbells before you start.","Ask someone to spot you on maximum loads.","Put the weights back when you finish."],plate:["Set the seat to your height.","Load the plates evenly on both sides.","Control the lowering, 2–3 seconds."],sel:["Set the seat and the weight pin.","Do 2 light test reps.","Full range, no swinging."],cardio:["Start with 3–5 easy minutes.","Pick the programme or level on the screen.","Wipe the machine down when you finish."],glute:["Set the pads to your hips.","Squeeze your glutes at the top for 1 second.","Lower slowly."],leg:["Line your knee up with the machine pivot.","Set the pad just above your ankle.","Control the lowering."],mono:["Set the hooks to the right height.","Ask someone to release the monolift arms.","Always use the side safeties."]};
 const EXACT_EN={
+"Escolhe o piso":"Select floor","SET POINT":"SET POINT","Set point: marcar onde estás":"Set point: mark where you are","Ir para ":"Go to ",
 "Toca no mapa onde estás agora":"Tap the map where you are now","Numa sala, num corredor ou junto a uma máquina. Mais tarde isto passa a ser automático (QR, NFC, Wi-Fi ou Bluetooth).":"In a room, a corridor or next to a machine. Later this becomes automatic (QR, NFC, Wi-Fi or Bluetooth).","Cancelar":"Cancel","Set point":"Set point","Toca dentro de uma sala ou corredor":"Tap inside a room or corridor","Escolhe um músculo para filtrar por tipo.":"Pick a muscle to filter by type.","Idioma / Language":"Language","Ponto marcado":"Pinned point",
 "Da cancela à máquina em 10 segundos":"From the gate to the machine in 10 seconds",
 "Na primeira entrada: encosta o telemóvel à cancela, escolhe o Big Muscle do dia, filtra pelo tipo de exercício e toca numa máquina. O mapa leva-te desde a receção pelas portas e escadas reais.":"On your first visit: tap your phone on the gate, pick today's Big Muscle, filter by exercise type and tap a machine. The map guides you from reception through the real doors and stairs.",
@@ -1243,7 +1281,7 @@ function render(){
   document.getElementById('tabs').hidden=(h==='entrada');document.getElementById('nextbar').hidden=false;
   if(S.scrollTo){const t=document.getElementById(S.scrollTo);S.scrollTo='';if(t)t.scrollIntoView({block:'start'});}
   if(h==='maquinas')document.getElementById('results').innerHTML=results();
-  document.getElementById('tabs').innerHTML=TABS.map(t=>t[0]==='ler'?`<a class="scan" href="#ler"${tab==='ler'?' aria-current="page"':''} aria-label="Ler QR ou NFC"><span>${ic('qr',22)}</span></a>`:`<a href="#${t[0]}"${tab===t[0]?' aria-current="page"':''}>${ic(t[2])}${t[1]}${t[0]==='treino'&&S.treino.length?` (${S.treino.length})`:''}</a>`).join('');
+  document.getElementById('tabs').innerHTML=TABS.map(t=>t[0]==='ler'?`<button class="scan sp" type="button" data-act="sp-global"${S.setPoint?' aria-pressed="true"':''} aria-label="Set point: marcar onde estás"><span>${ic('pin',24,2.4)}</span>SET POINT</button>`:`<a href="#${t[0]}"${tab===t[0]?' aria-current="page"':''}>${ic(t[2])}${t[1]}${t[0]==='treino'&&S.treino.length?` (${S.treino.length})`:''}</a>`).join('');
   if(h==='mapa')bindMap();
   i18nDOM(document.body);
 }
@@ -1257,7 +1295,7 @@ function zoomAt(nz,cx,cy){const svg=document.getElementById('mapsvg');if(!svg)re
 function setPointAt(cx,cy){const svg=document.getElementById('mapsvg');if(!svg)return;const w=toWorld(svg,cx,cy);
   const r=PLAN.rooms.filter(r=>r.floor===S.floor&&(r.rect||r.polygon)).find(r=>inPoly(w.x,w.y,poly(r)));
   if(!r){toast('Toca dentro de uma sala ou corredor');return;}
-  S.pos={id:'pt',label:'Ponto marcado · '+RNAME(r.id),f:S.floor,x:+w.x.toFixed(2),y:+w.y.toFixed(2),room:r.id};S.setPoint=false;save();toast('Posição marcada: '+RNAME(r.id));render();}
+  S.pos={id:'pt',label:'Ponto marcado · '+RNAME(r.id),f:S.floor,x:+w.x.toFixed(2),y:+w.y.toFixed(2),room:r.id};S.setPoint=false;save();toast('Posição marcada: '+RNAME(r.id));if(S.spReturn){const h=S.spReturn;S.spReturn='';location.hash=h;}else render();}
 function bindMap(){const w=document.getElementById('mapwrap');if(!w)return;const P=new Map();let drag=null,pinch=null,lastTap=0;
   w.addEventListener('pointerdown',e=>{if(e.target.closest('button,.mappop'))return;P.set(e.pointerId,{x:e.clientX,y:e.clientY});
     if(P.size===2){const [p1,p2]=[...P.values()];pinch={d:Math.hypot(p1.x-p2.x,p1.y-p2.y),z:S.zoom};drag=null;}
@@ -1296,11 +1334,13 @@ function act(a,el){const d=el.dataset;
   case 'big-go':if(!S.big.length)break;S.onb=true;S.type='';save();location.hash='musculo';break;
   case 'back-big':S.big=[];S.type='';location.hash='musculo';break;
   case 'type':S.type=(S.type===d.v)?'':d.v;if(S.big[0]&&S.type&&S.type!=='Todos'){S.lastType[S.big[0]]=S.type;save();}S.scrollTo=S.type?'sec3':'';render();break;
+  case 'mopen':location.hash=d.s;break;
   case 'pick':{const m=BYCODE[d.c];S.flow=true;location.hash=m.slug;break;}
   case 'flex-start':S.flow=true;S.big=[];S.type='';location.hash='musculo';break;
   case 'muscle-go':S.muscle=d.m;S.room='Todas';S.q='';location.hash='maquinas';break;
   case 'muscle':S.muscle=d.m||d.v;S.mType='';render();break;
-  case 'setpoint':S.setPoint=!S.setPoint;S.pop=null;S.roomsOpen=false;render();break;
+  case 'setpoint':S.setPoint=!S.setPoint;S.pop=null;S.roomsOpen=false;S.roomSel=null;if(!S.setPoint&&S.spReturn){const r=S.spReturn;S.spReturn='';if(r!==location.hash){location.hash=r;break;}}render();break;
+  case 'sp-global':{if(S.setPoint){act('setpoint',el);break;}const h=location.hash||'#inicio';S.spReturn=(h==='#mapa')?'':h;S.setPoint=true;S.pop=null;S.roomsOpen=false;S.roomSel=null;if(S.pos&&S.pos.f!=null)S.floor=S.pos.f;if(h!=='#mapa')location.hash='mapa';else render();break;}
   case 'mtype':S.mType=S.mType===d.v?'':d.v;render();break;
   case 'lang':S.lang=d.v;save();render();break;
   case 'stair':{const T=STAIR_UI_T[+d.v];S.floor=T[0];S.pop=null;S.roomsOpen=false;S.roomSel=T[3];focusOn(T[1],T[2],2.2);render();break;}
