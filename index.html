@@ -377,6 +377,11 @@ header.top.plain .emb.lg{width:46px;height:46px;flex:none;animation:none;transfo
 .brand{flex:1 1 auto;min-width:0;gap:3px}
 .brand b{font:900 25px/1 var(--body);letter-spacing:-.3px;white-space:nowrap}
 .brand span{font:700 9.5px/1 var(--body);letter-spacing:4.2px;white-space:nowrap}
+
+/* v19b: next bar always on one line, scales with phone width */
+.nextbar button{gap:clamp(6px,2vw,12px);padding:0 clamp(8px,2.5vw,12px);font-size:clamp(10.5px,3.3vw,13.5px);letter-spacing:clamp(.6px,.75vw,3px)}
+.nextbar b{white-space:nowrap;overflow:hidden;text-overflow:clip;min-width:0}
+.nextbar b span{display:inline}
 </style>
 </head>
 <body>
