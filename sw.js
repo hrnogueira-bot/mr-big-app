@@ -1,5 +1,5 @@
 // Mr Big App: offline cache. Change VERSION on every new upload so phones pick up the update.
-const VERSION = 'mrbig-20261029-022613';
+const VERSION = 'mrbig-20261029-022627';
 const CORE = ['./', './index.html', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
