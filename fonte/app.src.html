@@ -1,0 +1,1342 @@
+<title>Mr Big App</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+<style>
+/* Layout: phone-sized member app on a stage, notes column on wide screens; full screen on phones */
+:root{
+  --display:'Inter','Helvetica Neue',Arial,sans-serif;
+  --label:'Inter','Helvetica Neue',Arial,sans-serif;
+  --body:'Inter','Helvetica Neue',Arial,sans-serif;
+  color-scheme:dark;
+  --stage:#1C1C1C; --stage-muted:#ABA69D;
+  --bg:#0B0B0B; --surf:#171717; --surf2:#242424; --line:#363636;
+  --fg:#F2EFE9; --muted:#ABA69D;
+  --accent:#D7192A; --on-accent:#FFFFFF; --accent-text:#F0444C; --up:#3C6EE6;
+  --tab-bg:#050505; --tab-fg:#ABA69D; --tab-on:#F0444C; --stripe:#F2EFE9;
+  --room:#1E1E1E; --room-entr:#58101A; --room-corr:#2E2C28; --room-mez:#302C26; --room-cave:#1E262E; --wall:#F2EFE9; --ghost:#3A3833;
+  --stair:#96928A; --park:#222222;
+  --c-free:#F0444C; --c-plate:#F2EFE9; --c-sel:#8FB4FF; --c-cardio:#5DBB63; --c-glute:#F2A93B; --c-leg:#C08BF5; --c-mono:#FFD23F;
+  --scrim:rgba(0,0,0,.6);
+  --lv-i:#6F9BFF; --lv-r:#4CC56A; --lv-a:#FF9A3C;
+  --card:#242424;
+}
+:root[data-app="cinza"]{
+  --card:#FFFFFF;
+  color-scheme:light;
+  --stage:#A9A9A5; --stage-muted:#2E2E2B;
+  --bg:#CFCFCC; --surf:#E6E5E1; --surf2:#BDBDB9; --line:#9A9A96;
+  --fg:#161616; --muted:#45453F;
+  --accent:#C8102E; --on-accent:#FFFFFF; --accent-text:#A50D25; --up:#1F4FC2;
+  --tab-bg:#1E1E1E; --tab-fg:#BDBDB8; --tab-on:#FF5A63; --stripe:#1E1E1E;
+  --room:#E6E5E1; --room-entr:#F2C9CE; --room-corr:#D9D6CE; --room-mez:#D6D0C4; --room-cave:#C9D3DB; --wall:#1E1E1E; --ghost:#B0AEA8;
+  --stair:#6B6B66; --park:#BDBDB9;
+  --c-free:#C8102E; --c-plate:#1E1E1E; --c-sel:#1F4FC2; --c-cardio:#2E7D32; --c-glute:#B26A00; --c-leg:#6A3DB8; --c-mono:#8A6D00;
+  --scrim:rgba(20,20,20,.5);
+  --lv-i:#1F4FC2; --lv-r:#1E7A33; --lv-a:#B85A00;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{overflow:hidden}
+body{background:var(--stage);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.35}
+button,input{font-family:inherit}
+:focus-visible{outline:3px solid var(--accent-text);outline-offset:2px}
+.stage{height:100%;display:flex;align-items:center;justify-content:center;gap:56px;padding-block:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.notes{width:300px;flex:none;max-height:100%;overflow:auto;display:flex;flex-direction:column;gap:16px;color:var(--fg)}
+.notes .plate{background:#FFFFFF;padding:12px;border-radius:2px}
+.notes .plate img{display:block;width:100%;height:auto}
+.notes h2{margin:0;font:800 32px/1 var(--display);text-transform:uppercase;letter-spacing:.5px;text-wrap:balance}
+.notes p{margin:0;color:var(--stage-muted);max-width:60ch}
+.notes .lbl{font:600 11px var(--label);letter-spacing:2px;color:var(--accent-text)}
+:root[data-app="cinza"] .notes .lbl{color:var(--fg)}
+.jump{display:flex;flex-direction:column;gap:4px}
+.jump a{color:var(--fg);text-decoration:none;font:800 17px var(--display);text-transform:uppercase;letter-spacing:.5px;padding:6px 0;border-bottom:2px solid var(--line);display:flex;justify-content:space-between}
+.jump a span{font:400 12px var(--body);color:var(--stage-muted);text-transform:none;letter-spacing:0;align-self:center}
+@media (max-width:900px){.notes{display:none}}
+.phone{width:390px;max-width:100%;height:min(844px,100%);background:var(--bg);color:var(--fg);border:10px solid #000000;border-radius:46px;overflow:hidden;position:relative;display:flex;flex-direction:column;box-shadow:0 30px 80px rgba(0,0,0,.45)}
+@media (max-width:520px){.stage{padding:0}.phone{width:100%;height:100%;border:0;border-radius:0;box-shadow:none}}
+#view{flex:1;min-height:0;display:flex;flex-direction:column}
+.scr{flex:1;min-height:0;display:flex;flex-direction:column}
+.top{display:flex;align-items:center;gap:10px;padding-top:16px;padding-bottom:12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));border-bottom:3px solid var(--accent)}
+.top.plain{border-bottom:0}
+.top h1{margin:0;flex:1;min-width:0;font:800 28px/1 var(--display);text-transform:uppercase;letter-spacing:.5px}
+.top .meta{font:600 10px var(--label);letter-spacing:1px;color:var(--muted);white-space:nowrap}
+.emb{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--accent);flex:none;background:#FFFFFF}
+.emb.lg{width:48px;height:48px}
+.brand{flex:1;display:flex;flex-direction:column;gap:2px}
+.brand b{font:800 26px/1 var(--display);letter-spacing:1px;text-transform:uppercase;font-weight:800}
+.brand span{font:600 12px var(--label);letter-spacing:2px;color:var(--accent-text);text-transform:uppercase}
+.icon-btn{width:44px;height:44px;flex:none;display:inline-flex;align-items:center;justify-content:center;border:2px solid var(--line);border-radius:2px;background:transparent;color:var(--fg);cursor:pointer;text-decoration:none}
+.icon-btn.acc{border-color:var(--accent)}
+.stripes{display:flex;flex-direction:column;gap:3px;flex:none}
+.stripes i{display:block;height:5px;background:var(--accent)}
+.stripes i:nth-child(2){height:3px;background:var(--stripe)}
+.body{flex:1;min-height:0;overflow-y:auto;padding-top:16px;padding-bottom:24px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
+.sec-h{display:flex;align-items:center;gap:8px;font:600 13px var(--label);letter-spacing:1px;text-transform:uppercase;margin:0}
+.sec-h::before{content:"";width:10px;height:10px;background:var(--accent);flex:none}
+.sec-h small{margin-left:auto;font:400 12px var(--body);letter-spacing:0;color:var(--muted);text-transform:none}
+.muted{color:var(--muted)}
+.card{background:var(--surf);border:2px solid var(--line);border-radius:2px;padding:14px;display:flex;flex-direction:column;gap:10px;color:var(--fg);text-decoration:none}
+.card.acc{border-color:var(--accent)}
+.card h3{margin:0;font:800 21px/1.05 var(--display);text-transform:uppercase;letter-spacing:.3px;text-wrap:balance}
+.eyebrow{font:600 10px var(--label);letter-spacing:2px;color:var(--accent-text)}
+.hero{background:var(--accent);color:var(--on-accent);padding:16px;border-radius:2px;display:flex;flex-direction:column;gap:12px}
+.hero .big{font:800 42px/.95 var(--display);text-transform:uppercase}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;border-top:2px solid var(--on-accent);padding-top:10px}
+.stats b{display:block;font:800 22px var(--display);font-weight:800;font-variant-numeric:tabular-nums}
+.stats span{font-size:11px;font-weight:700;text-transform:uppercase}
+.search{display:flex;align-items:center;gap:10px;min-height:48px;padding:0 14px;background:var(--surf);border:2px solid var(--line);border-radius:2px;color:var(--muted);text-decoration:none;font-size:16px}
+.search input{flex:1;min-width:0;background:transparent;border:0;outline:none;color:var(--fg);font-size:16px}
+.btn{min-height:46px;border:0;border-radius:2px;background:var(--accent);color:var(--on-accent);font:800 16px var(--display);letter-spacing:.5px;text-transform:uppercase;cursor:pointer;padding:0 14px;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;text-align:center}
+.btn.ghost{background:transparent;color:var(--fg);border:2px solid var(--fg)}
+.btn.quiet{background:transparent;color:var(--muted);border:2px dashed var(--line);font:400 14px var(--body);text-transform:none;letter-spacing:0}
+.btn.sm{min-height:38px;font-size:14px;padding:0 10px}
+.btn-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.mgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.mgrid button{min-height:54px;background:var(--surf);border:2px solid var(--line);border-radius:2px;color:var(--fg);font:800 14px var(--display);text-transform:uppercase;letter-spacing:.5px;cursor:pointer;padding:0 4px}
+.seg{display:flex;border:2px solid var(--line);border-radius:2px;flex:none}
+.seg button{flex:1;min-height:38px;padding:0 8px;border:0;background:transparent;color:var(--muted);font:600 11px var(--label);letter-spacing:1px;cursor:pointer;white-space:nowrap}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;flex:none}
+.chip{flex:none;min-height:36px;padding:0 12px;border:2px solid var(--line);border-radius:2px;background:transparent;color:var(--fg);font:800 13px var(--display);text-transform:uppercase;letter-spacing:.5px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.filters{display:flex;flex-direction:column;gap:8px;padding-top:10px;padding-bottom:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));border-bottom:2px solid var(--line)}
+.list{display:flex;flex-direction:column;gap:6px}
+.row{display:flex;align-items:center;gap:10px;padding:8px 10px;min-height:54px;background:var(--surf);border:2px solid var(--line);border-radius:2px;color:var(--fg);text-decoration:none}
+.row .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.row .tx b{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .tx span{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dotc{width:12px;height:12px;border-radius:50%;flex:none}
+.badge{flex:none;font:800 13px var(--display);letter-spacing:.5px;padding:3px 7px;border-radius:2px;background:var(--surf2);color:var(--fg);white-space:nowrap}
+.tag{font-size:12px;font-weight:700;padding:4px 9px;border-radius:2px;border:2px solid var(--line);text-transform:uppercase}
+.tag.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.kv{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.kv div{background:var(--surf);border:2px solid var(--line);padding:8px;display:flex;flex-direction:column;gap:2px}
+.kv span{font:600 9px var(--label);letter-spacing:1px;color:var(--muted)}
+.kv b{font:800 17px var(--display);font-weight:800}
+.photo{height:190px;flex:none;background:var(--surf2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--muted);position:relative}
+.photo .icon-btn{position:absolute;left:max(14px,env(safe-area-inset-left,0px));top:14px;background:var(--bg);border-color:var(--accent)}
+.title-xl{margin:0;font:800 32px/1 var(--display);text-transform:uppercase;letter-spacing:.5px;text-wrap:balance}
+.howto ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px;color:var(--muted)}
+/* map */
+.mapwrap{flex:1;min-height:0;position:relative;background:var(--bg);overflow:hidden;touch-action:none}
+.mapwrap svg{width:100%;height:100%;display:block;cursor:grab}
+.mapctl{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:6px}
+.mapctl button{width:40px;height:40px;border:2px solid var(--line);background:var(--surf);color:var(--fg);font:800 20px var(--display);cursor:pointer;border-radius:2px}
+.maplegend{position:absolute;left:8px;top:8px;display:flex;gap:8px;max-width:calc(100% - 66px);background:color-mix(in srgb,var(--bg) 85%,transparent);padding:4px 7px;font-size:10.5px;color:var(--fg);border-radius:2px;white-space:nowrap;overflow:hidden}
+.maplegend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:-1px}
+.mapsheet{flex:none;margin:0 10px 10px;max-height:44%;overflow:auto}
+.steps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px;font-size:14px}
+.steps li.cur{color:var(--accent-text);font-weight:700}
+.eta{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.eta b{font:800 20px var(--display);color:var(--accent-text);font-weight:800;font-variant-numeric:tabular-nums}
+/* treino */
+.titem{display:flex;align-items:center;gap:8px;padding:8px;background:var(--surf);border:2px solid var(--line);border-radius:2px}
+.titem.done{opacity:.55}
+.titem.done .tx b{text-decoration:line-through}
+.num{width:28px;height:28px;flex:none;background:var(--accent);color:var(--on-accent);display:flex;align-items:center;justify-content:center;font:800 15px var(--display)}
+.sets{display:flex;align-items:center;gap:4px}
+.sets button{width:30px;height:30px;border:2px solid var(--line);background:transparent;color:var(--fg);cursor:pointer;font-weight:700}
+.sets b{min-width:30px;text-align:center;font:800 15px var(--display);font-variant-numeric:tabular-nums}
+.tabs{display:flex;flex:none;background:var(--tab-bg);border-top:3px solid var(--accent);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+.tabs a{flex:1;min-height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--tab-fg);text-decoration:none;font:600 9.5px var(--label);letter-spacing:1px}
+.tabs a[aria-current="page"]{color:var(--tab-on)}
+.tabs a.scan{color:var(--on-accent)}
+.tabs a.scan span{width:46px;height:46px;margin-top:-18px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;border:3px solid var(--tab-bg)}
+.toast{position:absolute;left:16px;right:16px;bottom:128px;background:var(--fg);color:var(--bg);padding:12px 14px;font-weight:700;border-radius:2px;z-index:5}
+.qr{display:flex;align-items:center;gap:12px;min-height:50px;padding:0 12px;border:2px solid var(--line);border-radius:2px;background:var(--surf);color:var(--fg);cursor:pointer;text-align:left;font-size:15px;width:100%}
+.qr[aria-pressed="true"]{border-color:var(--accent)}
+.foot{font-size:12px;color:var(--muted);text-align:center}
+.tabs[hidden]{display:none}
+.card.dash{border-style:dashed}
+.chk{width:24px;height:24px;accent-color:var(--accent);flex:none}
+.news{border-left:6px solid var(--accent)}
+.field{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted)}
+.field input[type="text"],.field input[type="date"]{min-height:44px;padding:0 12px;background:var(--bg);border:2px solid var(--line);border-radius:2px;color:var(--fg);font-size:15px;width:100%}
+.check{display:flex;align-items:center;gap:10px;min-height:44px;font-size:15px}
+.vers{display:flex;flex-direction:column;gap:6px}
+.vers button{text-align:left;padding:12px;min-height:60px;border-radius:2px;border:2px solid var(--line);background:transparent;color:var(--fg);cursor:pointer;display:flex;flex-direction:column;gap:3px}
+.vers button[aria-pressed="true"]{border-color:var(--accent);background:var(--surf)}
+.vers b{font:800 16px var(--display);text-transform:uppercase;font-weight:800}
+.vers span{font-size:13px;color:var(--muted)}
+.vers span.live{color:var(--accent-text)}
+.planbox{height:360px;background:var(--bg);border:2px solid var(--line);padding:4px}
+.planbox svg{width:100%;height:100%;display:block}
+.leg{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted)}
+.leg i{display:inline-block;width:14px;height:14px;vertical-align:-2px;margin-right:6px}
+.mcard{display:flex;gap:12px;align-items:stretch;background:var(--surf);border:2px solid var(--line);border-radius:2px;color:var(--fg);text-decoration:none;padding:0;cursor:pointer;text-align:left;width:100%;min-height:92px;overflow:hidden;font:inherit}
+.mcard .pic{width:96px;flex:none;background:#FFFFFF;display:flex;align-items:center;justify-content:center;border-right:2px solid var(--line);position:relative;overflow:hidden}
+.pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#FFFFFF}
+.mcard .pic svg{width:76px;height:76px}
+.mcard .tx>span{flex:none}
+.mcard .tx{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:3px;padding:10px 0}
+.mcard .br{font-weight:700;font-size:13px;letter-spacing:.8px;text-transform:uppercase;color:var(--accent-text)}
+.mcard .nm{font-size:17px;line-height:1.2;color:var(--fg);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.mcard .mt{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mcard .go{align-self:center;padding-right:10px;color:var(--muted);flex:none}
+.mcard.sm{min-height:72px}.mcard.sm .pic{width:74px}.mcard.sm .pic svg{width:56px;height:56px}.mcard.sm .nm{font-size:15px}
+.titem .pic{width:46px;height:46px;flex:none;background:#FFFFFF;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.titem .pic svg{width:38px;height:38px}
+.mgrid button[aria-pressed="true"],.bigt[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.lvl{display:inline-block;font:700 10.5px var(--body);letter-spacing:.6px;text-transform:uppercase;padding:2px 6px;border:2px solid currentColor;border-radius:999px;line-height:1.2;white-space:nowrap}
+.lvl-I{color:var(--lv-i)}.lvl-R{color:var(--lv-r)}.lvl-A{color:var(--lv-a)}
+.mcard .brrow{display:flex;align-items:center;gap:8px;min-width:0}
+.mcard .brrow .br{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.mcard .brrow .lvl{flex:none}
+.tile{overflow:hidden}
+.steps4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+.steps4 span{font:600 9.5px var(--label);letter-spacing:.8px;text-transform:uppercase;padding:6px 2px 0;border-top:4px solid var(--line);color:var(--muted);text-align:center}
+.steps4 span.done{border-color:var(--accent);color:var(--fg)}
+.steps4 span.cur{border-color:var(--accent);color:var(--accent-text);font-weight:700}
+.flex{display:flex;align-items:center;gap:14px;width:100%;padding:14px;background:var(--surf);border:3px solid var(--accent);border-radius:2px;color:var(--fg);cursor:pointer;text-align:left}
+.flex .emb{width:76px;height:76px;border-width:3px;box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 25%,transparent)}
+.flex b{display:block;font:800 30px/.95 var(--display);text-transform:uppercase;letter-spacing:.3px}
+.flex .sub{display:block;font-size:12px;color:var(--muted);margin-top:6px}
+.btn.go{min-height:58px;font-size:24px;width:100%}
+.guide{display:flex;flex-direction:column;gap:10px}
+.guide ol{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:6px;font-size:15px}
+.guide .err{font-size:14px;border-left:4px solid var(--lv-a);padding:4px 10px;color:var(--fg)}
+.mini{display:flex;gap:12px;align-items:center;padding:10px;background:var(--surf);border:2px solid var(--line);border-radius:2px;color:var(--fg);text-decoration:none}
+.mini .pic{width:64px;height:64px;flex:none;background:#FFFFFF;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.mini .pic svg{width:50px;height:50px}
+.mini .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.mini .tx b{font:800 19px/1.05 var(--display);text-transform:uppercase;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mini .tx span{font-size:12px;color:var(--muted)}
+.logform{display:flex;flex-direction:column;gap:12px;border-color:var(--accent)}
+.logform h3 span{color:var(--accent-text)}
+.num3{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.numf{display:flex;flex-direction:column;gap:6px;font:600 10px var(--label);letter-spacing:1px;color:var(--muted)}
+.numf .ctl{display:flex;align-items:stretch;border:2px solid var(--line);border-radius:2px;background:var(--bg)}
+.numf .ctl button{width:40px;flex:none;border:0;background:transparent;color:var(--fg);font:800 22px var(--display);cursor:pointer}
+.numf input{flex:1;min-width:0;width:100%;min-height:48px;border:0;background:transparent;color:var(--fg);text-align:center;font:800 26px var(--display);font-variant-numeric:tabular-nums}
+.numf input[type="date"]{font:500 16px var(--body);padding:0 10px;text-align:left;border:2px solid var(--line);border-radius:2px;background:var(--bg);color-scheme:inherit}
+.logday{display:flex;flex-direction:column;gap:6px}
+.logday h4{margin:0;font:600 11px var(--label);letter-spacing:1.5px;color:var(--muted);display:flex;justify-content:space-between}
+.logrow{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--surf);border:2px solid var(--line);border-radius:2px}
+.logrow .s{width:26px;height:26px;flex:none;background:var(--surf2);display:flex;align-items:center;justify-content:center;font:800 13px var(--display)}
+.logrow b{flex:1;font:800 20px var(--display);font-weight:800;font-variant-numeric:tabular-nums}
+.logrow b small{font:400 13px var(--body);color:var(--muted);margin-left:4px}
+.logrow button{width:36px;height:36px;border:0;background:transparent;color:var(--muted);cursor:pointer}
+.pr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.pr div{background:var(--surf);border:2px solid var(--line);padding:8px;display:flex;flex-direction:column;gap:2px}
+.pr span{font:600 9px var(--label);letter-spacing:1px;color:var(--muted)}
+.pr b{font:800 20px var(--display);font-weight:800;font-variant-numeric:tabular-nums}
+.nextbar{flex:none;background:var(--tab-bg);border-top:1px solid var(--line);padding:6px 10px;padding-left:max(10px,env(safe-area-inset-left,0px));padding-right:max(10px,env(safe-area-inset-right,0px))}
+.nextbar[hidden]{display:none}
+.nextbar:has(+ .tabs[hidden]){padding-bottom:max(6px,env(safe-area-inset-bottom,0px))}
+.nextbar button{width:100%;min-height:40px;display:flex;align-items:center;justify-content:center;gap:10px;background:var(--surf);border:1px solid var(--accent);border-radius:999px;color:var(--fg);font:800 15px var(--display);letter-spacing:.8px;text-transform:uppercase;cursor:pointer;padding:3px 4px}
+.nextbar img{width:30px;height:30px;border-radius:50%;object-fit:cover;background:#FFFFFF;flex:none}
+.nextbar b{flex:1;text-align:center;font-weight:400}
+.nextbar b span{color:var(--accent-text)}
+.steps3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.fsec{display:flex;align-items:baseline;gap:8px;margin:6px 0 0;font:600 13px var(--label);letter-spacing:1px;text-transform:uppercase}
+.fsec em{font-style:normal;width:20px;height:20px;flex:none;display:inline-flex;align-items:center;justify-content:center;background:var(--accent);color:var(--on-accent);font:800 13px var(--display);align-self:center}
+.fsec small{margin-left:auto;font:400 12px var(--body);letter-spacing:0;text-transform:none;color:var(--muted)}
+:root{--st-free:#3DBA5C;--st-go:#FF9A3C;--st-busy:#E5303C}
+.scr{position:relative}
+.mappop{position:absolute;left:8px;right:8px;bottom:8px;z-index:4;background:var(--surf);border:2px solid var(--accent);border-radius:4px;box-shadow:0 -10px 40px rgba(0,0,0,.55);padding:12px;display:flex;flex-direction:column;gap:12px;min-height:30%}
+.mappop .x{position:absolute;right:6px;top:6px;width:40px;height:40px;border:0;background:transparent;color:var(--fg);cursor:pointer}
+.mappop .row1{display:flex;gap:12px}
+.mappop .pic{width:124px;height:124px;flex:none;background:#FFFFFF;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.mappop .pic svg{width:90px;height:90px}
+.mappop .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px;padding-right:30px}
+.mappop .br{font-weight:700;font-size:13px;letter-spacing:.8px;text-transform:uppercase;color:var(--accent-text)}
+.mappop h3{margin:0;font:800 24px/1.02 var(--display);text-transform:uppercase}
+.mappop .mt{font-size:12px;color:var(--muted)}
+.st{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700}
+.st i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.tile .em{font-size:24px;line-height:1;opacity:1;display:block;overflow:visible;margin-bottom:auto;padding-bottom:4px;max-width:none}
+.tile.hasem{min-height:78px}
+.tiles.sm .tile .em{font-size:15px;padding-bottom:2px}
+.tiles.sm .tile.hasem{min-height:56px}
+.tiles.lg .tile.hasem{min-height:92px}
+.tiles.lg .tile .em{font-size:28px}
+.tile[aria-pressed="true"] .em{filter:drop-shadow(0 0 2px rgba(0,0,0,.35))}
+.tile.ghost{border-style:dashed;background:transparent;min-height:78px;opacity:.5}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.tile{position:relative;min-height:66px;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:2px;padding:8px 7px;background:var(--surf);border:2px solid var(--line);border-radius:2px;color:var(--fg);cursor:pointer;text-align:left;min-width:0}
+.tile b{font:800 13px/1.08 var(--display);text-transform:uppercase;letter-spacing:0;font-weight:800;overflow-wrap:normal;word-break:normal;max-width:100%}
+.tile span{font-size:11px;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.tile i{position:absolute;top:0;right:0;font:600 8.5px var(--label);letter-spacing:.6px;font-style:normal;background:var(--accent);color:var(--on-accent);padding:2px 4px}
+.tile[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.tile[aria-pressed="true"] i{background:var(--on-accent);color:var(--accent)}
+.tiles.sm .tile{min-height:46px;padding:6px}
+.tiles.sm .tile b{font-size:13px}
+.tiles.lg .tile{min-height:84px}
+.tiles.lg .tile b{font-size:16px}
+.crumb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);flex-wrap:wrap}
+.crumb b{color:var(--fg)}
+.crumb button{background:none;border:0;color:var(--accent-text);font:inherit;font-weight:700;cursor:pointer;padding:4px 0;text-decoration:underline}
+.photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.credit{font-size:11px;color:var(--muted)}
+.bigs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.bigt{min-height:78px;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:2px;padding:10px 12px;background:var(--surf);border:2px solid var(--line);border-radius:2px;color:var(--fg);cursor:pointer;text-align:left}
+.bigt b{font:800 24px/1 var(--display);text-transform:uppercase;letter-spacing:.5px;font-weight:800}
+.bigt span{font-size:12px;opacity:.8}
+.cta{flex:none;padding-top:10px;padding-bottom:12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));border-top:2px solid var(--line);background:var(--bg)}
+.cta .btn{width:100%}
+.btn:disabled{opacity:.4;cursor:default}
+.nfcring{width:168px;height:168px;border-radius:50%;border:3px solid var(--accent);background:transparent;color:var(--fg);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
+.nfcring::before,.nfcring::after{content:"";position:absolute;inset:-3px;border-radius:50%;border:3px solid var(--accent);opacity:0;animation:ring 2.2s ease-out infinite}
+.nfcring::after{animation-delay:1.1s}
+@keyframes ring{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.45);opacity:0}}
+@media (prefers-reduced-motion:reduce){.nfcring::before,.nfcring::after{animation:none}}
+.here-ok{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--fg);background:var(--surf);border-left:4px solid var(--accent);padding:8px 10px}
+.grp-h{font:600 11px var(--label);letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin:6px 0 0}
+.empty{padding:24px 8px;text-align:center;color:var(--muted);display:flex;flex-direction:column;gap:10px;align-items:center}
+/* v13: list cards, tiny level, round icon badges, legible labels */
+.mcard{display:flex;gap:12px;align-items:stretch;padding:8px;min-height:0;cursor:default;flex:none}
+.mcard .pic{width:92px;height:92px;flex:none;align-self:flex-start;border:0;border-radius:6px;background:#FFFFFF;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.mcard .pic img{object-fit:cover;object-position:center}
+.mcard .pic svg{width:64px;height:64px}
+.mcard .tx{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-start;gap:2px;padding:0}
+.mcard .br{font:700 11px/1.2 var(--body);letter-spacing:.9px;text-transform:uppercase;color:var(--accent-text);white-space:normal;overflow:visible}
+.mcard .nm{font:700 15px/1.2 var(--body);color:var(--fg);display:block;-webkit-line-clamp:unset;overflow:visible;overflow-wrap:anywhere}
+.mcard .mt{font-size:12px;color:var(--muted);white-space:normal;overflow:visible}
+.mcard .acts{display:flex;align-items:center;gap:6px;margin-top:auto;padding-top:6px}
+.cb{min-height:32px;padding:0 12px;border:0;border-radius:999px;background:var(--accent);color:var(--on-accent);font:700 12.5px var(--body);letter-spacing:.3px;cursor:pointer;display:inline-flex;align-items:center;gap:3px;text-decoration:none;white-space:nowrap}
+.cb.ghost{background:transparent;color:var(--fg);border:1.5px solid var(--line)}
+.mcard .acts .lvl{margin-left:auto;align-self:flex-end}
+.mcard.sm .pic{width:72px;height:72px}.mcard.sm .nm{font-size:14px}
+.lvl{display:inline-flex;align-items:center;gap:4px;font:700 10px var(--body);letter-spacing:.5px;text-transform:uppercase;padding:0;border:0;white-space:nowrap}
+.lvl i{width:7px;height:7px;border-radius:50%;background:currentColor;display:inline-block}
+.tile .em{width:36px;height:36px;border-radius:50%;background:var(--surf2);display:flex;align-items:center;justify-content:center;font-size:21px;padding:0;margin-bottom:auto}
+.tiles.sm .tile .em{width:26px;height:26px;font-size:15px}
+.tiles.lg .tile .em{width:42px;height:42px;font-size:25px}
+.tile[aria-pressed="true"] .em{background:rgba(255,255,255,.2);filter:none}
+.tile.hasem{min-height:88px;gap:3px}
+.tile b{font:700 12.5px/1.1 var(--body);text-transform:none;letter-spacing:0}
+.tile span:not(.em){font-size:11px}
+:root[data-app="cinza"] body{font-weight:500}
+:root[data-app="cinza"] .mcard .nm,:root[data-app="cinza"] .tile b,:root[data-app="cinza"] .row .tx b{font-weight:800}
+:root[data-app="cinza"] .mcard .mt,:root[data-app="cinza"] .muted,:root[data-app="cinza"] .crumb,:root[data-app="cinza"] .tile span:not(.em){font-weight:600}
+:root[data-app="cinza"] .title-xl,:root[data-app="cinza"] .top h1{font-weight:900}
+:root[data-app="cinza"] .fsec,:root[data-app="cinza"] .eyebrow,:root[data-app="cinza"] .lvl{font-weight:800}
+.seg.lang button{min-height:34px;padding:0 9px;font-weight:800}
+/* v14: rounded grey cards with red border, GO + checklist, centred tiles, clean section titles */
+.mcard{border-radius:18px;background:var(--card);border:1.5px solid var(--accent);padding:10px}
+.mcard .pic{border-radius:12px}
+.cb{min-height:34px;padding:0 16px;font:800 13px var(--body);letter-spacing:.8px}
+.cb.ic{width:34px;min-height:34px;padding:0;justify-content:center;background:transparent;color:var(--fg);border:1.5px solid var(--line);border-radius:50%}
+.mcard .acts .lvl{margin-left:auto;align-self:flex-end;font:600 8.5px var(--body);letter-spacing:.6px;opacity:.95}
+.lvl i{display:none}
+.tile{align-items:center;justify-content:center;text-align:center;border-radius:14px}
+.tile .em{margin:0 0 4px}
+.tile b,.tile span:not(.em){text-align:center;max-width:100%}
+.tile i{border-radius:0 12px 0 8px}
+.fsec{align-items:center;font:700 13px var(--body);letter-spacing:.08em;text-transform:uppercase;margin-top:10px}
+.fsec em{width:24px;height:24px;border-radius:8px;font:800 13px var(--body)}
+.fsec small{font:500 12px var(--body);letter-spacing:0}
+.steps4 span{font:700 10px var(--body);letter-spacing:.08em}
+.eyebrow{font-family:var(--body);font-weight:700;letter-spacing:.14em}
+</style>
+
+<div class="stage">
+  <aside class="notes" aria-label="Sobre este protótipo">
+    <div class="plate"><img id="logoFull" alt="Mr Big Evolution"></div>
+    <div class="lbl">PROTÓTIPO · APP DE SÓCIO</div>
+    <h2>Da cancela à máquina em 10 segundos</h2>
+    <p>Na primeira entrada: encosta o telemóvel à cancela, escolhe o Big Muscle do dia, filtra pelo tipo de exercício e toca numa máquina. O mapa leva-te desde a receção pelas portas e escadas reais.</p>
+    <div class="seg" role="group" aria-label="Tema">
+      <button type="button" data-act="theme-set" data-v="preto">PRETO &amp; VERMELHO</button>
+      <button type="button" data-act="theme-set" data-v="cinza">VERMELHO &amp; CINZA</button>
+    </div>
+    <nav class="jump" aria-label="Ir para ecrã">
+      <a href="#entrada" data-act="reset-onb">Primeira entrada <span>10 segundos</span></a>
+      <a href="#inicio">Início <span>atalhos</span></a>
+      <a href="#maquinas">Máquinas <span>400, por sala e fila</span></a>
+      <a href="#ler">Ler QR / NFC <span>estou aqui</span></a>
+      <a href="#mapa">Mapa <span>3 pisos e rota</span></a>
+      <a href="#treino">Treino <span>rota otimizada</span></a>
+      <a href="#breve">Brevemente <span>planta futura</span></a>
+      <a href="#gestor">Planeador <span>modo gestor</span></a>
+    </nav>
+    <p>Planta mockup v1.9. Máquinas, marcas e posições são de exemplo, distribuídas pela legenda de cada sala.</p>
+  </aside>
+  <div class="phone" id="phone">
+    <div id="view"><div class="empty" style="margin:auto;max-width:300px"><b style="color:var(--fg);font:800 24px var(--display);text-transform:uppercase">A app não arrancou</b><span>Este visualizador mostra o ficheiro mas não corre a app. Abre o link no Safari ou no Chrome.</span></div></div>
+    <div class="nextbar" id="nextbar"><button type="button" data-act="next-bar" aria-label="Próxima Mr.Big Machine"><img alt="" id="nbL"><b>Próxima <span>Mr.Big</span> Machine</b><img alt="" id="nbR"></button></div>
+    <nav class="tabs" id="tabs" aria-label="Navegação principal"></nav>
+    <div class="toast" id="toast" role="status" hidden></div>
+  </div>
+</div>
+
+<script>
+(function(){
+const EMB="__EMBLEM__", LOGO="__LOGO__";
+document.getElementById('logoFull').src=LOGO;document.getElementById('nbL').src=EMB;document.getElementById('nbR').src=EMB;
+const PLAN=__PLAN__;
+
+/* ================= plan ================= */
+const ROOMS={}; PLAN.rooms.forEach(r=>{ROOMS[r.id]=r;});
+const poly=r=>r.rect?[[r.rect[0],r.rect[1]],[r.rect[0]+r.rect[2],r.rect[1]],[r.rect[0]+r.rect[2],r.rect[1]+r.rect[3]],[r.rect[0],r.rect[1]+r.rect[3]]]:(r.polygon||[]);
+const RNAME=id=>({C:'Corredor',PISTA:'Pista'})[id]||(ROOMS[id]&&ROOMS[id].name)||id;
+const FLOORNAME={'-1':'Piso -1 · Cave','0':'Piso 0','1':'Piso 1 · Mezaninos'};
+const LABELPOS={'4':[37,40],'3':[35.5,70],'C':[63.2,106.6],'5':[9,44],'0':[35.5,101.5],'7':[9,100.5],'8':[17.5,62],'2':[54.5,20],'1':[60.5,62],'6':[7,64],'M3':[35.5,62],'M4':[35.5,48.5],'C6':[9,75]};
+
+/* ================= machines (example data, linear rows per room) ================= */
+const CAT={free:{n:'Peso livre',c:'--c-free'},plate:{n:'Plate loaded',c:'--c-plate'},sel:{n:'Seletorizada',c:'--c-sel'},cardio:{n:'Cardio',c:'--c-cardio'},glute:{n:'Glúteos',c:'--c-glute'},leg:{n:'Pernas',c:'--c-leg'},mono:{n:'Monolift',c:'--c-mono'}};
+// [name, category, primary muscle, secondary, brand]
+const SETS={
+ cardio:[['Passadeira','cardio','Cardio',[],'Technogym'],['Bicicleta vertical','cardio','Cardio',['Pernas'],'Technogym'],['Elíptica','cardio','Cardio',[],'Life Fitness'],['Remo indoor','cardio','Cardio',['Costas'],'Concept2'],['Escada infinita','cardio','Cardio',['Glúteos'],'StairMaster'],['Bicicleta de spinning','cardio','Cardio',['Pernas'],'Technogym'],['Bicicleta reclinada','cardio','Cardio',[],'Life Fitness']],
+ sel1:[['Chest press','sel','Peito',['Tríceps'],'Technogym'],['Pec deck','sel','Peito',['Ombros'],'Technogym'],['Puxada frontal','sel','Costas',['Bíceps'],'Gym80'],['Remada sentada','sel','Costas',['Bíceps'],'Gym80'],['Press de ombro','sel','Ombros',['Tríceps'],'Panatta'],['Elevação lateral','sel','Ombros',[],'Panatta'],['Elevação frontal','sel','Ombros',[],'Gym80'],['Extensão de tríceps','sel','Tríceps',[],'Technogym'],['Curl de bíceps','sel','Bíceps',[],'Technogym'],['Abdominal','sel','Core',[],'Technogym'],['Lombar','sel','Costas',['Glúteos'],'Technogym']],
+ bars:[['Banco de supino plano com barra','free','Peito',['Tríceps','Ombros'],'Eleiko'],['Banco de supino inclinado com barra','free','Peito',['Ombros','Tríceps'],'Eleiko'],['Banco de supino declinado com barra','free','Peito',['Tríceps'],'Panatta'],['Banco de supino plano com barra','free','Peito',['Tríceps','Ombros'],'Panatta'],['Banco de supino inclinado com barra','free','Peito',['Ombros'],'Panatta']],
+ plate:[['Iso-lateral chest press','plate','Peito',['Tríceps'],'Hammer Strength'],['Iso-lateral incline press','plate','Peito',['Ombros'],'Hammer Strength'],['Iso-lateral decline press','plate','Peito',['Tríceps'],'Hammer Strength'],['Wide chest','plate','Peito',[],'Hammer Strength'],['Iso-lateral shoulder press','plate','Ombros',['Tríceps'],'Hammer Strength'],['Lateral raise plate','plate','Ombros',[],'Hammer Strength'],['Iso-lateral high row','plate','Costas',['Bíceps'],'Hammer Strength'],['Iso-lateral low row','plate','Costas',['Bíceps'],'Hammer Strength'],['Front lat pulldown','plate','Costas',['Bíceps'],'Hammer Strength'],['D.Y. row','plate','Costas',['Bíceps'],'Hammer Strength'],['Remada T','plate','Costas',['Bíceps'],'Panatta'],['Pullover plate','plate','Costas',['Peito'],'Panatta'],['Super incline','plate','Peito',['Ombros'],'Panatta'],['Chest press convergente','plate','Peito',['Tríceps'],'Gym80'],['Remada convergente','plate','Costas',['Bíceps'],'Gym80'],['Press militar sentado','plate','Ombros',['Tríceps'],'Gym80'],['Pendulum squat','plate','Pernas',['Glúteos'],'Panatta'],['V-squat','plate','Pernas',['Glúteos'],'Hammer Strength'],['Leg press 45° plate','plate','Pernas',['Glúteos'],'Gym80'],['Belt squat','plate','Pernas',['Glúteos'],'Panatta'],['Shrug plate','plate','Costas',['Ombros'],'Hammer Strength'],['Dips plate','plate','Tríceps',['Peito'],'Gym80'],['Curl plate','plate','Bíceps',[],'Panatta']],
+ legs:[['Extensão de pernas','leg','Pernas',[],'Panatta'],['Leg curl deitado','leg','Pernas',[],'Panatta'],['Leg curl sentado','leg','Pernas',[],'Technogym'],['Gémeos em pé','leg','Gémeos',[],'Gym80'],['Gémeos sentado','leg','Gémeos',[],'Hammer Strength'],['Leg press horizontal','leg','Pernas',['Glúteos'],'Technogym'],['Leg press 45°','leg','Pernas',['Glúteos'],'Panatta'],['Lunge machine','leg','Pernas',['Glúteos'],'Gym80'],['Tibialis','leg','Gémeos',[],'Prime'],['Nordic curl','leg','Pernas',[],'Prime']],
+ glutes:[['Hip thrust plate','glute','Glúteos',['Pernas'],'Prime'],['Hip thrust máquina','glute','Glúteos',['Pernas'],'Panatta'],['Glute kickback','glute','Glúteos',[],'Prime'],['Abdutora','glute','Glúteos',[],'Technogym'],['Adutora','glute','Pernas',[],'Technogym'],['Glute drive','glute','Glúteos',['Pernas'],'Gym80'],['Reverse hyper','glute','Glúteos',['Costas'],'Rogue'],['Banco de hip thrust','glute','Glúteos',[],'Rogue'],['Coice na polia','glute','Glúteos',[],'Panatta'],['Glúteo em pé','glute','Glúteos',[],'Prime']],
+ arms:[['Curl Scott máquina','sel','Bíceps',[],'Panatta'],['Curl sentado','sel','Bíceps',[],'Gym80'],['Tríceps na polia','sel','Tríceps',[],'Panatta'],['Dips assistidos','sel','Tríceps',['Peito'],'Technogym'],['Deltóide posterior','sel','Ombros',['Costas'],'Panatta'],['Elevação lateral sentado','sel','Ombros',[],'Gym80'],['Rotação de ombro','sel','Ombros',[],'Prime'],['Curl martelo na polia','sel','Bíceps',['Antebraço'],'Gym80'],['Antebraço','sel','Bíceps',['Antebraço'],'Prime']],
+ mono:[['Monolift','mono','Pernas',['Peito','Costas'],'Eleiko'],['Monolift','mono','Pernas',['Peito','Costas'],'Rogue']]
+};
+// rows: orientation v (x fixed, from a to b on y) or h (y fixed, from a to b on x); list = explicit items or set name
+const AREAS=[
+ {room:'1',f:0,quota:90,rows:[['v',52.6,56,95,15,'cardio'],['v',54.4,56,95,15,'cardio'],['v',59.6,56,95,15,'cardio'],['v',61.4,56,95,15,'sel1'],['v',66.6,56,95,15,'sel1'],['v',68.4,56,95,15,'sel1']]},
+ {room:'2',f:0,quota:25,rows:[['v',52.6,9,48,13,'bars'],['v',56.4,9,48,12,'bars2']]},
+ {room:'3',f:0,quota:999,rows:[23.4,25.2,30.1,31.9,36.8,38.6,43.3,45.1].map(x=>['v',x,56,94,10,'plate']).concat([['v',23.5,98,104,3,'plate']])},
+ {room:'4',f:0,quota:48,rows:[30.5,34,37.5,41,44.5,48].map((y,i)=>['h',y,23.5,46.5,8,'fw'+i])},
+ {room:'5',f:0,quota:30,rows:[['h',42,3,19,10,'glutes'],['h',45.5,3,13.5,7,'glutes'],['h',49,3,13.5,7,'glutes'],['h',39.8,8,17,6,'glutes']]},
+ {room:'6',f:0,quota:40,rows:[2.4,4.2,9.6,11.4].map(x=>['v',x,57,94,10,'legs'])},
+ {room:'8',f:0,quota:8,rows:[['v',17.5,60,103,8,'mono']]},
+ {room:'M4',f:1,quota:15,rows:[['h',32,30,38.5,5,'glutes'],['h',37,30,38.5,5,'glutes'],['h',42,30,38.5,5,'glutes']]},
+ {room:'M3',f:1,quota:35,rows:[25.6,33.5,35.5,37.5,45.4].map((x,i)=>['v',x,i===4?64.5:56,83,5,'cab'+(i%4)]).concat([['h',94.8,26.5,44.5,5,'cab1'],['v',25.8,99.5,105,2,'cab2'],['v',45.2,99.5,105,3,'cab3']])},
+ {room:'C6',f:-1,quota:33,rows:[2.5,4.3,9.6,11.4,18.8].map(x=>['v',x,57,93,7,'plate'])}
+];
+// room 2: benches along the room, the last two of the 2nd row are hacks and one shoulder press just before them
+SETS.bars2=SETS.bars;
+// room 4 (under M4): free weights, 8 columns x 6 rows (plan view)
+const FW=[].concat(
+ [...Array(6)].map((_,i)=>['Halteres · conjunto '+(i+1),'free','Bíceps',['Ombros','Peito','Tríceps'],'Eleiko']),
+ [['Banco ajustável','free','Peito',['Ombros'],'Panatta'],['Banco ajustável','free','Peito',['Ombros'],'Panatta']],
+ [...Array(8)].map(()=>['Banco plano / inclinado','free','Peito',['Ombros','Tríceps'],'Panatta']),
+ [...Array(6)].map(()=>['Multipower','free','Pernas',['Peito','Ombros'],'Technogym']),
+ [['Smith machine','free','Pernas',['Peito','Ombros'],'Panatta'],['Smith machine','free','Pernas',['Peito','Ombros'],'Panatta']],
+ [...Array(3)].map(()=>['Base de powerlifting','free','Pernas',['Costas','Glúteos'],'Eleiko']),
+ [['Hack squat livre','free','Pernas',['Glúteos'],'Panatta'],['Rack de agachamento','free','Pernas',['Glúteos','Core'],'Rogue'],['Rack de agachamento','free','Pernas',['Glúteos','Core'],'Rogue'],['Rack de agachamento','free','Pernas',['Glúteos','Core'],'Rogue'],['Rack de agachamento','free','Pernas',['Glúteos','Core'],'Rogue']],
+ [...Array(4)].map(()=>['Banco de supino olímpico','free','Peito',['Tríceps'],'Eleiko']),
+ [['Banco Scott livre','free','Bíceps',[],'Panatta'],['Banco Scott livre','free','Bíceps',[],'Panatta'],['Banco lombar','free','Costas',['Glúteos'],'Panatta'],['Banco lombar','free','Costas',['Glúteos'],'Panatta'],['Banco abdominal','free','Core',[],'Panatta'],['Banco abdominal','free','Core',[],'Panatta'],['Barra de elevações','free','Costas',['Bíceps'],'Rogue'],['Paralelas de dips','free','Tríceps',['Peito'],'Rogue']]);
+for(let i=0;i<6;i++)SETS['fw'+i]=FW.slice(i*8,i*8+8);
+// M3: cable stations and pulley structures, varied by muscle
+const CAB=[
+ ['Crossover de cabos duplo','sel','Peito',['Ombros'],'Panatta'],['Puxada alta na polia','sel','Costas',['Bíceps'],'Gym80'],['Remo baixo na polia','sel','Costas',['Bíceps'],'Gym80'],['Tríceps na polia alta','sel','Tríceps',[],'Panatta'],['Curl de bíceps na polia baixa','sel','Bíceps',[],'Panatta'],
+ ['Elevação lateral na polia','sel','Ombros',[],'Gym80'],['Face pull na polia','sel','Ombros',['Costas'],'Prime'],['Estação multi-polia 4 lugares','sel','Costas',['Peito','Ombros'],'Technogym'],['Pullover na polia','sel','Costas',['Peito'],'Prime'],['Remada unilateral na polia','sel','Costas',['Bíceps'],'Prime'],
+ ['Peck fly de cabos','sel','Peito',[],'Prime'],['Press de ombro na polia','sel','Ombros',['Tríceps'],'Gym80'],['Tríceps overhead na polia','sel','Tríceps',[],'Prime'],['Curl Bayesian na polia','sel','Bíceps',[],'Prime'],['Deltóide posterior em cabos','sel','Ombros',['Costas'],'Panatta'],
+ ['Remada alta na polia','sel','Ombros',['Costas'],'Gym80'],['Elevação frontal na polia','sel','Ombros',[],'Prime'],['Estrutura de polias ajustável','sel','Peito',['Costas','Ombros'],'Technogym'],['Curl Scott máquina','sel','Bíceps',[],'Panatta'],['Dips assistidos','sel','Tríceps',['Peito'],'Technogym'],['Puxada unilateral na polia','sel','Costas',['Bíceps'],'Prime']];
+for(let i=0;i<4;i++)SETS['cab'+i]=CAB.slice(i*5).concat(CAB.slice(0,i*5));
+
+
+const OBST=[]; // stairs footprints (+margin) to keep machines clear
+PLAN.links.forEach(L=>{
+  const pad=0.9;
+  if(L.rect){OBST.push({f:L.floor,x:L.rect[0]-pad,y:L.rect[1]-pad,w:L.rect[2]+2*pad,h:L.rect[3]+2*pad});if(L.toFloor!=null)OBST.push({f:L.toFloor,x:L.rect[0]-pad,y:L.rect[1]-pad,w:L.rect[2]+2*pad,h:L.rect[3]+2*pad});}
+  if(L.path){const w=L.width/2+pad;for(let i=1;i<L.path.length;i++){const a=L.path[i-1],b=L.path[i];const r={x:Math.min(a[0],b[0])-w,y:Math.min(a[1],b[1])-w,w:Math.abs(a[0]-b[0])+2*w,h:Math.abs(a[1]-b[1])+2*w};OBST.push(Object.assign({f:L.floor},r));if(L.toFloor!=null)OBST.push(Object.assign({f:L.toFloor},r));}}
+});
+const blocked=(f,x,y)=>OBST.some(o=>o.f===f&&x>o.x&&x<o.x+o.w&&y>o.y&&y<o.y+o.h);
+const DISPLAY={'8':'7'};
+const M=[]; const BYCODE={};
+AREAS.forEach(A=>{
+  let count=0; const counters={};
+  A.rows.forEach((R,ri)=>{
+    const [o,fixed,a,b,n,setName]=R; const set=SETS[setName]; const letter='ABCDEFGHIJ'[ri];
+    let k=0;
+    for(let i=0;i<n&&count<A.quota;i++){
+      const t=n===1?0.5:i/(n-1); const v=a+(b-a)*t; const x=o==='v'?fixed:v, y=o==='v'?v:fixed;
+      if(blocked(A.f,x,y))continue;
+      let item=set[k%set.length]; k++;
+      if(A.room==='2'&&setName==='bars2'){const left=Math.min(n,A.quota-count);if(i===n-2||i===n-1)item=['Hack squat','plate','Pernas',['Glúteos'],'Panatta'];else if(i===n-3)item=['Press de ombro com barra','free','Ombros',['Tríceps'],'Eleiko'];}
+      const key=item[0]; counters[key]=(counters[key]||0)+1;
+      const disp=DISPLAY[A.room]||A.room; const code=disp+'-'+letter+String(i+1).padStart(2,'0');
+      const m={code,slug:'m-'+code.toLowerCase(),name:item[0],cat:item[1],muscle:item[2],sec:item[3],brand:item[4],room:A.room,f:A.f,row:letter,pos:i+1,x:+x.toFixed(2),y:+y.toFixed(2)};
+      M.push(m);BYCODE[code]=m;count++;
+    }
+  });
+});
+M.forEach(m=>{const same=M.filter(x=>x.name===m.name);if(same.length>1)m.nameN=m.name+' '+(same.indexOf(m)+1);else m.nameN=m.name;});
+/* machine pictograms, always on white */
+const K='stroke="#111" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"',RD='fill="#D7192A" stroke="#111" stroke-width="2"';
+const PICS={
+ tread:`<path ${K} d="M6 46h44l6 7H11zM48 46l4-30M44 12h14v6H44zM50 24l-12 2"/>`,
+ bike:`<path ${K} d="M10 55h44M27 40l-4-18M19 21h11M46 55l-2-36M40 17h11M27 40h17"/><circle ${K} cx="44" cy="44" r="8"/><circle ${RD} cx="27" cy="42" r="3"/>`,
+ ellip:`<path ${K} d="M8 55h48M42 55l3-42M30 14l8 26M14 50l26-6"/><circle ${K} cx="48" cy="46" r="7"/><circle ${RD} cx="14" cy="50" r="2.5"/>`,
+ rower:`<path ${K} d="M6 48h50M8 48v6M48 48v6M42 36l5 12M28 34h12"/><circle ${K} cx="50" cy="38" r="8"/><rect ${RD} x="16" y="42" width="11" height="5" rx="1"/>`,
+ stairs:`<path ${K} d="M8 56h48M12 56V46h10V36h10V26h10V16h10v40M44 16V8"/>`,
+ dumb:`<path ${K} d="M18 22h28M18 44h28"/><rect ${RD} x="10" y="14" width="8" height="16" rx="1"/><rect ${RD} x="46" y="14" width="8" height="16" rx="1"/><rect ${RD} x="10" y="36" width="8" height="16" rx="1"/><rect ${RD} x="46" y="36" width="8" height="16" rx="1"/>`,
+ bench:`<path ${K} d="M10 33h40M16 37l-3 15M46 37l3 15M9 52h10M44 52h10M50 33l6-14"/><rect ${RD} x="10" y="29" width="34" height="6" rx="2"/>`,
+ rack:`<path ${K} d="M14 8v48M50 8v48M14 8h36M8 56h48M14 40h8M42 40h8M6 26h52"/><rect ${RD} x="7" y="18" width="5" height="16" rx="1"/><rect ${RD} x="52" y="18" width="5" height="16" rx="1"/>`,
+ pull:`<path ${K} d="M12 8v48M52 8v48M6 10h52M6 56h52M22 34h-10M42 34h10"/><circle ${RD} cx="32" cy="10" r="2.5"/>`,
+ cable:`<rect ${K} x="7" y="8" width="9" height="48"/><rect ${K} x="48" y="8" width="9" height="48"/><path ${K} d="M7 8h50M16 14l12 26M48 14l-12 26M4 56h56"/><path ${RD} d="M9 38h5v14H9zM50 38h5v14h-5z"/><circle ${K} cx="28" cy="42" r="2.5"/><circle ${K} cx="36" cy="42" r="2.5"/>`,
+ plate:`<path ${K} d="M10 56h44M40 56V16l14 16M18 20l6 26M20 46h16M40 30l-14 2"/><circle ${RD} cx="53" cy="36" r="7"/><circle cx="53" cy="36" r="1.6" fill="#111"/>`,
+ legp:`<path ${K} d="M6 56h52M12 52l38-34M10 40l12 10M40 12l14 14M8 48h14"/><circle ${RD} cx="44" cy="25" r="6"/>`,
+ hip:`<path ${K} d="M6 56h52M8 30h22M12 30l-2 26M26 30l2 26M30 46l22-14"/><rect ${K} x="8" y="27" width="22" height="6" rx="2"/><circle ${RD} cx="52" cy="32" r="7"/>`,
+ sel:`<rect ${K} x="40" y="8" width="16" height="48"/><path ${K} d="M8 56h50M14 40h18M16 40l-2-22M18 18l22-4M24 40v16"/><rect ${RD} x="43" y="30" width="10" height="22"/><path stroke="#111" stroke-width="1.4" d="M43 35h10M43 40h10M43 45h10"/>`
+};
+function picKey(m){const n=m.name.toLowerCase();
+ if(m.cat==='cardio'){if(/passadeira/.test(n))return 'tread';if(/elíptica/.test(n))return 'ellip';if(/remo/.test(n))return 'rower';if(/escada/.test(n))return 'stairs';return 'bike';}
+ if(/halteres/.test(n))return 'dumb';
+ if(/multipower|smith|rack|powerlifting|monolift|hack squat livre/.test(n))return 'rack';
+ if(/elevações|paralelas/.test(n))return 'pull';
+ if(/banco/.test(n))return 'bench';
+ if(/polia|cabos|crossover|face pull|estação|estrutura/.test(n))return 'cable';
+ if(/leg press|hack|v-squat|pendulum|belt squat/.test(n))return 'legp';
+ if(/thrust|glute drive/.test(n))return 'hip';
+ if(m.cat==='plate')return 'plate';
+ return 'sel';}
+/* real photos (Wikimedia Commons, free licences), pictogram underneath as fallback */
+const PHOTO={"tread": ["https://thumb.wikimedia.org/wikipedia/commons/thumb/6/62/Treadmill-gym.jpg/330px-Treadmill-gym.jpg", "GhoziSeptiandri", "CC BY-SA 4.0"], "bike": ["https://thumb.wikimedia.org/wikipedia/commons/thumb/7/77/Stationary_bikes_at_a_gym.jpg/330px-Stationary_bikes_at_a_gym.jpg", "KeepActive Australia", "CC BY-SA 4.0"], "spin": ["https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cf/Yellow_Exercise_bike1.jpg/330px-Yellow_Exercise_bike1.jpg", "CNEcija12345", "CC BY-SA 4.0"], "ellip": ["https://thumb.wikimedia.org/wikipedia/commons/thumb/d/da/Elliptical_machine.jpg/330px-Elliptical_machine.jpg", "Cpe", "CC BY-SA 3.0"], "rower": ["https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ab/%E9%A3%8E%E9%98%BB%E5%88%92%E8%88%B9%E5%99%A8%EF%BC%88Concept2_E%E5%9E%8B%E5%88%92%E8%88%B9%E5%99%A8%EF%BC%89.JPG/330px-%E9%A3%8E%E9%98%BB%E5%88%92%E8%88%B9%E5%99%A8%EF%BC%88Concept2_E%E5%9E%8B%E5%88%92%E8%88%B9%E5%99%A8%EF%BC%89.JPG", "Nick3488", "CC BY-SA 3.0"], "cardio": ["https://thumb.wikimedia.org/wikipedia/commons/thumb/d/df/Viking_Glory%2C_gym%2C_20231209_-_08.jpg/330px-Viking_Glory%2C_gym%2C_20231209_-_08.jpg", "AleWi", "CC BY-SA 4.0"], "dumb": ["https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d0/Marines%27_voices_echo%2C_prompt_new_gym_hours_150927-M-AI083-067.jpg/330px-Marines%27_voices_echo%2C_prompt_new_gym_hours_150927-M-AI083-067.jpg", "Lance Cpl. Jason Jimenez", "Domínio público"], "dumb2": ["https://thumb.wikimedia.org/wikipedia/commons/thumb/5/50/A_close-up_view_of_a_set_of_heavy_dumbbells.jpg/330px-A_close-up_view_of_a_set_of_heavy_dumbbells.jpg", "Shixart1985", "CC BY 2.0"], "bench": ["https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f1/Weight_benches.webp/330px-Weight_benches.webp", "Wikideas1", "CC0"], "bench2": ["https://thumb.wikimedia.org/wikipedia/commons/thumb/6/61/Two_weight_training_benches.jpg/330px-Two_weight_training_benches.jpg", "Wolfgang1018", "CC BY-SA 3.0"], "benchp": ["https://thumb.wikimedia.org/wikipedia/commons/thumb/0/08/Incline_bench_for_bench_pressing.jpg/330px-Incline_bench_for_bench_pressing.jpg", "Teemeah", "CC BY-SA 4.0"], "rack": ["https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a3/Powerrack.jpg/330px-Powerrack.jpg", "Matus", "CC BY 3.0"], "smith": ["https://thumb.wikimedia.org/wikipedia/commons/thumb/7/74/Smith_machine.webp/330px-Smith_machine.webp", "Wikideas1", "CC0"], "plbase": ["https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9f/Power_Rack.JPG/330px-Power_Rack.JPG", "Wissembourg", "CC BY-SA 3.0"], "pull": ["https://thumb.wikimedia.org/wikipedia/commons/thumb/4/44/Chinap%2C_Chest%2C_Back%2C_Bicep%2C_tricep_Machine.jpg/330px-Chinap%2C_Chest%2C_Back%2C_Bicep%2C_tricep_Machine.jpg", "Aliva Sahoo", "CC BY-SA 4.0"], "cable": ["https://thumb.wikimedia.org/wikipedia/commons/thumb/6/68/Lat_pulldown_machine_20180112.jpg/330px-Lat_pulldown_machine_20180112.jpg", "Santeri Viinamäki", "CC BY-SA 4.0"], "cable2": ["https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2f/Shoulder_Fly_Machine.jpg/330px-Shoulder_Fly_Machine.jpg", "Aliva Sahoo", "CC BY-SA 4.0"], "pchest": ["https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e5/Chest_Incline.jpg/330px-Chest_Incline.jpg", "Aliva Sahoo", "CC BY-SA 4.0"], "pshoulder": ["https://thumb.wikimedia.org/wikipedia/commons/thumb/2/23/Shoulder_Press.jpg/330px-Shoulder_Press.jpg", "Aliva Sahoo", "CC BY-SA 4.0"], "pback": ["https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2a/Diverging_Lat_Pulldown_Machine.jpg/330px-Diverging_Lat_Pulldown_Machine.jpg", "Teddyhtsai", "CC0"], "plate": ["https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a4/Tricep_Pull_down.jpg/330px-Tricep_Pull_down.jpg", "Aliva Sahoo", "CC BY-SA 4.0"], "legp": ["https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9f/Leg_Press_Machine.jpg/330px-Leg_Press_Machine.jpg", "Paulmcdonald", "CC BY-SA 4.0"], "hack": ["https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2d/Leg_press_machine.jpg/330px-Leg_press_machine.jpg", "Teemeah", "CC BY-SA 4.0"], "hipt": ["https://thumb.wikimedia.org/wikipedia/commons/thumb/7/71/Weight_benche_15761311874.jpg/330px-Weight_benche_15761311874.jpg", "Lusokapevy", "CC BY-SA 4.0"], "glute": ["https://thumb.wikimedia.org/wikipedia/commons/thumb/7/79/Glute_ham_raise.jpg/330px-Glute_ham_raise.jpg", "Iron Tool", "CC BY-SA 4.0"], "abd": ["https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f9/Hip_abductor_machine.jpg/330px-Hip_abductor_machine.jpg", "Teemeah", "CC BY-SA 4.0"], "pecdeck": ["https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cf/Pec_deck_Fly.jpg/330px-Pec_deck_Fly.jpg", "Aliva Sahoo", "CC BY-SA 4.0"], "selback": ["https://thumb.wikimedia.org/wikipedia/commons/thumb/7/70/Back_Pull_down.jpg/330px-Back_Pull_down.jpg", "Aliva Sahoo", "CC BY-SA 4.0"], "selsh": ["https://thumb.wikimedia.org/wikipedia/commons/thumb/1/11/Bench_press_Machine.jpg/330px-Bench_press_Machine.jpg", "Aliva Sahoo", "CC BY-SA 4.0"]};
+function photoKey(m){const n=m.name.toLowerCase(),alt=m.pos%2;
+ if(m.cat==='cardio'){if(/passadeira/.test(n))return 'tread';if(/spinning/.test(n))return 'spin';if(/bicicleta/.test(n))return 'bike';if(/elíptica/.test(n))return 'ellip';if(/remo/.test(n))return 'rower';return 'cardio';}
+ if(/halteres/.test(n))return alt?'dumb':'dumb2';
+ if(/multipower|smith/.test(n))return 'smith';
+ if(/powerlifting/.test(n))return 'plbase';
+ if(/rack|monolift|hack squat livre/.test(n))return 'rack';
+ if(/elevações|paralelas|dips assistidos/.test(n))return 'pull';
+ if(/supino|olímpico/.test(n))return 'benchp';
+ if(/thrust|glute drive/.test(n))return 'hipt';
+ if(/abdutora|adutora/.test(n))return 'abd';
+ if(/kickback|coice|glúteo|hyper|nordic/.test(n))return 'glute';
+ if(/banco/.test(n))return alt?'bench':'bench2';
+ if(/polia|cabos|crossover|face pull|estação|estrutura/.test(n))return alt?'cable':'cable2';
+ if(/leg press|v-squat|pendulum|belt squat/.test(n))return 'legp';
+ if(/hack|lunge|extensão de pernas|leg curl|gémeos|tibialis/.test(n))return 'hack';
+ if(m.cat==='plate')return m.muscle==='Peito'?'pchest':m.muscle==='Ombros'?'pshoulder':m.muscle==='Costas'?'pback':'plate';
+ if(m.muscle==='Peito')return 'pecdeck';if(m.muscle==='Costas'||m.muscle==='Core')return 'selback';if(m.muscle==='Ombros')return 'selsh';
+ return 'plate';}
+const PHOTOD=__PHOTOS__;
+const pic=m=>{const p=PHOTO[photoKey(m)];return `<svg viewBox="0 0 64 64" aria-hidden="true">${PICS[picKey(m)]}</svg>${p?`<img src="${PHOTOD[photoKey(m)]||p[0]}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`:''}`;};
+const credit=m=>{const p=PHOTO[photoKey(m)];return p?`Foto de exemplo: ${esc(p[1])} · ${esc(p[2])} · Wikimedia Commons`:'';};
+const TYPE_RULES={
+ Ombros:[[/elevação lateral|lateral raise/,'Elevação lateral'],[/frontal/,'Elevação frontal'],[/posterior|face pull|rotação/,'Posterior'],[/remada alta|shrug/,'Remada alta'],[/press|militar/,'Press']],
+ Peito:[[/inclin/,'Inclinado'],[/declin/,'Declinado'],[/fly|pec deck|crossover|wide chest/,'Aberturas'],[/dips|paralelas/,'Dips'],[/press|supino|chest/,'Press']],
+ Costas:[[/puxada|pulldown|elevações/,'Puxada'],[/remada|row|remo/,'Remada'],[/pullover/,'Pullover'],[/lombar|hyper/,'Lombar'],[/shrug/,'Trapézio']],
+ 'Bíceps':[[/martelo|antebraço/,'Martelo'],[/scott/,'Scott'],[/curl/,'Curl']],
+ 'Tríceps':[[/overhead/,'Acima da cabeça'],[/dips|paralelas/,'Dips'],[/polia/,'Polia'],[/extensão/,'Extensão']],
+ Pernas:[[/extensão de pernas/,'Extensão'],[/curl|nordic/,'Flexão'],[/leg press/,'Leg press'],[/lunge/,'Lunge'],[/adutora/,'Adutores'],[/squat|agachamento|multipower|smith|powerlifting|monolift|hack/,'Squat']],
+ 'Glúteos':[[/thrust|glute drive/,'Hip thrust'],[/kickback|coice|em pé/,'Coice'],[/abdutora/,'Abdução'],[/hyper/,'Reverse hyper']],
+ 'Gémeos':[[/em pé/,'Em pé'],[/sentado/,'Sentado'],[/tibialis/,'Tibial']]
+};
+function exType(m,mu){const n=m.name.toLowerCase();if(/halteres/.test(n))return 'Halteres';
+ if(m.muscle!==mu)return 'Multi-articular';
+ for(const [re,t] of (TYPE_RULES[mu]||[]))if(re.test(n))return t;
+ return 'Outros';}
+const isDB=m=>/halteres/i.test(m.name);
+const forMuscle=mu=>M.filter(m=>m.muscle===mu||(isDB(m)&&BIG8.includes(mu)&&mu!=='Gémeos'));
+/* emoji icons: one per muscle group and one per exercise type */
+const MEMO={Peito:'🛡️',Costas:'🦅',Ombros:'🪨','Bíceps':'💪','Tríceps':'🦾',Pernas:'🦵','Glúteos':'🍑','Gémeos':'🦶',Core:'🍫',Cardio:'🏃',Todos:'✨'};
+const TEMO={Todos:'✨',Press:'⬆️','Elevação lateral':'↔️','Elevação frontal':'🔼',Posterior:'🔙','Remada alta':'⤴️',Halteres:'🏋️','Multi-articular':'🔗',Outros:'➕',
+ Inclinado:'↗️',Declinado:'↘️',Aberturas:'🦋',Dips:'⏬',Puxada:'⬇️',Remada:'🚣',Pullover:'🌀',Lombar:'🧱','Trapézio':'🔺',
+ Curl:'↩️',Scott:'🪑',Martelo:'🔨','Tríceps|Extensão':'⤵️',Polia:'🪢','Acima da cabeça':'🙆',
+ Squat:'🏋️‍♀️','Leg press':'🦿','Pernas|Extensão':'🦵','Flexão':'🔁',Lunge:'🚶',Adutores:'🤏',
+ 'Hip thrust':'🌉',Coice:'🐴','Abdução':'↔️','Reverse hyper':'🔄','Em pé':'🧍',Sentado:'🪑',Tibial:'👟'};
+/* option B: own line icons, one stroke, take the text colour */
+const IC={
+Peito:'<path d="M6.5 4.5C4.5 6 4 8.5 4 11c0 5 3.6 8.6 8 9.5 4.4-.9 8-4.5 8-9.5 0-2.5-.5-5-2.5-6.5"/><path d="M7 9.5c1.6 2 3.4 2 5 0 1.6 2 3.4 2 5 0"/>',
+Costas:'<path d="M4.5 5.5c2.4 1 4.9 1.5 7.5 1.5s5.1-.5 7.5-1.5c-.5 4.5-1.8 8-3.3 10.5-1.2 2-2.6 3-4.2 3s-3-1-4.2-3C6.3 13.5 5 10 4.5 5.5z"/><path d="M12 9v8"/><path d="M8.5 10.5 12 13l3.5-2.5"/>',
+Ombros:'<circle cx="12" cy="6" r="2.5"/><path d="M4 20v-2.5A5.5 5.5 0 0 1 9.5 12h5a5.5 5.5 0 0 1 5.5 5.5V20"/><circle cx="7" cy="15" r="1.4"/><circle cx="17" cy="15" r="1.4"/>',
+'Bíceps':'<path d="M4 19c0-4.5 2.2-7.5 5.5-8.5L11 6.5c.3-.9 1-1.5 2-1.5h1.5c.8 0 1.2.9.7 1.5L13.5 8.5l.5 1.5c3.3-.3 6 1.9 6 5.3 0 2.2-1.8 3.7-4 3.7z"/><path d="M10 15c1.5-1 3.5-1 5 .5"/>',
+'Tríceps':'<path d="M3 9.5h10.5a3.5 3.5 0 0 1 0 7H3"/><path d="M7 12.8c1.5 1.2 3.5 1.2 5 0"/><path d="M18.5 13H21"/>',
+Pernas:'<path d="M8.5 3c-1 3.5-.8 6.5.8 9l-.8 8.5"/><path d="M14.5 3c.5 4 0 7.5-1.7 10l-1.3 7.5"/><path d="M8.5 20.5h5"/><path d="M9.3 12h3.7"/>',
+'Glúteos':'<path d="M12 7v9"/><path d="M12 8c-1.5-1.5-3-2-4.5-2C5.5 6 4 8 4 11c0 4 2.5 7 5.5 7 1.2 0 2-.5 2.5-1.5.5 1 1.3 1.5 2.5 1.5 3 0 5.5-3 5.5-7 0-3-1.5-5-3.5-5-1.5 0-3 .5-4.5 2z"/>',
+'Gémeos':'<path d="M10 3c-1.8 3.5-2 7 0 10.5l-.5 4.5c-.1 1.4.9 2.5 2.3 2.5H18"/><path d="M14 3c1.5 3.5 1.4 7-.6 10"/>',
+Core:'<rect x="6.5" y="3.5" width="11" height="17" rx="4.5"/><path d="M12 5.5v13M7 10h10M7 14.5h10"/>',
+Cardio:'<path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7a4.3 4.3 0 0 1 7.5 2.8C19.5 15.4 12 20 12 20z"/><path d="M6 12.5h3l1.5-2.5 2.5 4.5 1.5-2H18"/>',
+Todos:'<rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/>',
+Press:'<path d="M12 20V7"/><path d="M7.5 11 12 6.5l4.5 4.5"/><path d="M5 3.5h14"/>',
+'Elevação lateral':'<circle cx="12" cy="5" r="2"/><path d="M12 9v11"/><path d="M4 13c2.5-1.6 5-2.3 8-2.3s5.5.7 8 2.3"/><path d="M5.5 10 3.5 13l3 1.3M18.5 10l2 3-3 1.3"/>',
+'Elevação frontal':'<circle cx="8" cy="5" r="2"/><path d="M8 9v11"/><path d="M8 13c4 0 8-2.5 10-6.5"/><path d="M15 6h3.5v3.5"/>',
+Posterior:'<path d="M19 12a7 7 0 1 1-2.1-5"/><path d="M17.5 3v4h-4"/>',
+'Remada alta':'<path d="M12 20V9"/><path d="M8 12.5l4-4 4 4"/><path d="M5 5c2 0 3 1 3 3M19 5c-2 0-3 1-3 3"/>',
+Halteres:'<rect x="2.5" y="8" width="4" height="8" rx="1.5"/><rect x="17.5" y="8" width="4" height="8" rx="1.5"/><path d="M6.5 12h11"/>',
+'Multi-articular':'<path d="M10 14a4 4 0 0 1 0-5.5l2.5-2.5a4 4 0 0 1 5.5 5.5l-1.2 1.2"/><path d="M14 10a4 4 0 0 1 0 5.5L11.5 18A4 4 0 0 1 6 12.5l1.2-1.2"/>',
+Outros:'<circle cx="12" cy="12" r="8"/><path d="M12 8.5v7M8.5 12h7"/>',
+Inclinado:'<path d="M4 18.5 18 9"/><path d="M13 8.5h5.5V14"/><path d="M3.5 21h17"/>',
+Declinado:'<path d="M4 7.5 18 17"/><path d="M18.5 11.5V17H13"/><path d="M3.5 21h17"/>',
+Aberturas:'<path d="M3.5 7c3 0 6 2.5 7.5 6.5"/><path d="M20.5 7c-3 0-6 2.5-7.5 6.5"/><circle cx="12" cy="16.5" r="1.6"/>',
+Dips:'<path d="M4.5 9h5M14.5 9h5"/><path d="M6 9v11M18 9v11"/><path d="M12 4v9"/><path d="M9 10.5l3 3 3-3"/>',
+Puxada:'<path d="M4 4h16"/><path d="M12 7v12"/><path d="M8 15l4 4 4-4"/>',
+Remada:'<path d="M20 12H6"/><path d="M10 7.5 5.5 12l4.5 4.5"/><circle cx="20" cy="12" r="1.5"/>',
+Pullover:'<path d="M4.5 9.5a8 8 0 0 1 14.5 3"/><path d="M15.5 12.5h3.5V9"/><path d="M4 19h16"/>',
+Lombar:'<circle cx="12" cy="4.5" r="1.8"/><rect x="9.8" y="8" width="4.4" height="3" rx="1.5"/><rect x="9.8" y="12.5" width="4.4" height="3" rx="1.5"/><rect x="9.8" y="17" width="4.4" height="3" rx="1.5"/>',
+'Trapézio':'<path d="M4 19.5c0-4 3.5-7 8-7s8 3 8 7"/><path d="M8 10V4.5M16 10V4.5"/><path d="M6 6.5l2-2 2 2M14 6.5l2-2 2 2"/>',
+Curl:'<path d="M4 19.5h6"/><path d="M10 19.5a8 8 0 0 0 8-8V9"/><path d="M14.5 12.5 18 9l3.5 3.5"/>',
+Scott:'<path d="M5 20 13 10"/><path d="M13 10c2 4 4.5 5 7 5"/><circle cx="20" cy="15" r="1.4"/><path d="M9 20h11"/>',
+Martelo:'<rect x="4" y="4" width="11" height="5.5" rx="2"/><path d="M11 9.5V20"/>',
+'Tríceps|Extensão':'<circle cx="7" cy="6" r="1.8"/><path d="M7 8.5v4.5a3 3 0 0 0 3 3h8"/><path d="M15 13l3 3-3 3"/>',
+Polia:'<circle cx="12" cy="6.5" r="3"/><path d="M12 9.5V18"/><path d="M9 18h6"/><path d="M4 3h16"/>',
+'Acima da cabeça':'<circle cx="12" cy="13" r="2"/><path d="M12 16v5"/><path d="M8.5 10 10 4.5M15.5 10 14 4.5"/><path d="M9 4.5h6"/>',
+Squat:'<path d="M4 5h16"/><path d="M8.5 5v4.5l-2 4.5 3 5.5"/><path d="M15.5 5v4.5l2 4.5-3 5.5"/>',
+'Leg press':'<path d="M4 20 16 8"/><path d="M13.5 5.5l5 5"/><path d="M4 14h5v6"/>',
+'Pernas|Extensão':'<path d="M4 9h8"/><path d="M12 9a7 7 0 0 1 7 7"/><path d="M12 9v11"/><path d="M15.5 16H19v-3.5"/>',
+'Flexão':'<path d="M4 9h9"/><path d="M13 9l5 7"/><path d="M19.5 7.5a7 7 0 0 0-6.5-4.5"/><path d="M19.5 3.5v4h-4"/>',
+Lunge:'<circle cx="12" cy="4" r="2"/><path d="M12 7v6"/><path d="M12 13l-5 3v4"/><path d="M12 13l5 7"/>',
+Adutores:'<path d="M3 12h6M21 12h-6"/><path d="M6 9l3 3-3 3M18 9l-3 3 3 3"/>',
+'Hip thrust':'<path d="M3 18h3.5l4-6.5h3l4 6.5H21"/><circle cx="12" cy="8" r="1.8"/>',
+Coice:'<circle cx="7" cy="5.5" r="2"/><path d="M7 8.5v5L4.5 19.5"/><path d="M7 13.5l6.5-2.5L19 7"/><path d="M16 6h3.5v3.5"/>',
+'Abdução':'<path d="M10 12H3M14 12h7"/><path d="M6 9l-3 3 3 3M18 9l3 3-3 3"/>',
+'Reverse hyper':'<path d="M4 8.5h10"/><path d="M14 8.5c0 6 2 9 6 10.5"/><path d="M14 8.5c3 3 5 4 7 4"/>',
+'Em pé':'<path d="M7 20.5h10"/><path d="M12 18V8"/><path d="M8 11.5 12 7.5l4 4"/>',
+Sentado:'<path d="M7 4v16"/><path d="M7 13h10v7"/>',
+Tibial:'<path d="M8 3v12l7 5"/><path d="M15 20h4"/><path d="M14.5 9.5 18 6"/><path d="M15 6h3v3"/>'
+};
+const lic=k=>`<svg class="li" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-.15em">${IC[k]||IC.Outros}</svg>`;
+Object.keys(MEMO).forEach(k=>MEMO[k]=lic(k));TEMO.Todos=lic('Todos');
+const temo=(mu,t)=>lic(IC[mu+'|'+t]?mu+'|'+t:(IC[t]?t:'Outros'));
+const MUSCLES=['Peito','Costas','Ombros','Bíceps','Tríceps','Pernas','Glúteos','Gémeos','Core','Cardio'];
+const ROOMORDER=['1','2','3','4','5','6','8','M3','M4','C6'];
+
+/* ================= routing graph (metres, per floor) ================= */
+const N=[]; const E=[];
+function node(id,f,x,y,rooms){N.push({id,f,x,y,rooms});return id;}
+// openings
+PLAN.links.filter(L=>L.wall).forEach(L=>{const [[x1,y1],[x2,y2]]=L.wall;node(L.id,0,(x1+x2)/2,(y1+y2)/2,L.rooms.slice());});
+node('EXT',0,40,109,['C','out']);
+// the 3→4 passage sits at the top of the stairs: from room 3 you can only reach it by climbing them
+{const p9=N.find(n=>n.id==='P9');if(p9)p9.rooms=['4'];}
+// stairs (low end → high end), hand-placed ends that match the drawing
+const ST=[
+ ['S1',[0,22.5,51.5,['4']],[0,17,51.5,['5']]],
+ ['S3',[0,48,48.7,['4']],[0,50.9,48.7,['2']]],
+ ['S5',[0,53,106,['C']],[0,53,99,['1']]],
+ ['S6',[0,2.1,101.5,['C']],[0,3.6,98.5,['7']]],
+ ['S7',[0,41.3,45,['4']],[1,41.3,38,['M4','PISTA']]],
+ ['S2',[-1,15.3,60,['C6']],[0,23,47.8,['4']]],
+ ['S4a',[0,48.15,63.4,['3']],[0,48.15,55,['3']]],
+ ['S4b',[0,48.15,55,['3']],[1,43.5,54.4,['M3']]]
+];
+// clickable stair labels: [floor,x,y,label,up,targetIndex]; targets: [floor,x,y,room]
+const STAIR_UI_T=[[0,17,51.5,'5'],[0,22.5,51.5,'4'],[0,50.9,48.7,'2'],[0,48,48.7,'4'],[0,53,97,'1'],[0,53,106.5,'C'],[0,3.6,98.5,'7'],[0,2.1,102,'C'],[1,41.3,38,'M4'],[0,41.3,45,'4'],[-1,15.3,61,'C6'],[0,23,47.8,'4'],[1,43.5,56,'M3'],[0,46.5,52,'4'],[0,48.15,64,'3']];
+const STAIR_UI=[[0,22.5,51.5,'▲ SALA 5',1,0],[0,17,51.5,'▼ SALA 4',0,1],[0,48,48.7,'▲ SALA 2',1,2],[0,50.9,48.7,'▼ SALA 4',0,3],[0,53,106,'▲ SALA 1',1,4],[0,53,99,'▼ CORREDOR',0,5],[0,2.1,101.5,'▲ POSES',1,6],[0,3.6,98.5,'▼ CORREDOR',0,7],[0,41.3,45,'▲ MEZANINO 4',1,8],[1,41.3,38,'▼ SALA 4',0,9],[0,23,47.8,'▼ CAVE',0,10],[-1,15.3,60,'▲ SALA 4',1,11],[0,48.15,63.4,'▲ MEZANINO 3',1,12],[0,48.15,59,'▲ SALA 4',1,13],[1,43.5,54.4,'▼ SALA 3',0,14]];
+ST.forEach(([id,a,b])=>{node(id+'_lo',a[0],a[1],a[2],a[3]);node(id+'_hi',b[0],b[1],b[2],b[3]);E.push([id+'_lo',id+'_hi',Math.hypot(a[1]-b[1],a[2]-b[2])+(a[0]!==b[0]?6:2),id]);});
+// S4 landing reaches room 4 through P9
+E.push(['S4a_hi','P9',2,'land']);E.push(['S4a_hi','S4b_lo',0.1,'land']);N.filter(n=>n.id==='S4a_hi'||n.id==='S4b_lo').forEach(n=>n.rooms=['landing3']); E.push(['S4b_lo','P9',2,'land']);
+node('PISTA_N',1,35.5,24.5,['M4','PISTA']);
+// M3 waist (narrowing) and the band by reception
+[['WM3a',35.5,89.3],['WM3b',35.5,84],['WM3c',35.5,94.5],['WM3d',25.8,95],['WM3e',45.2,95]].forEach(w=>node(w[0],1,w[1],w[2],['M3']));
+// waypoints for the concave rooms (U of room 3 around reception, L-shaped corridor)
+[['W3a',24.5,95.5,'3'],['W3b',46.5,95.5,'3'],['W3c',46.5,55.5,'3'],['WCa',2.1,108.5,'C'],['WCb',16,108.5,'C'],['WCc',40,108.5,'C'],['WCd',52,108.5,'C'],['WCe',60,106.5,'C']].forEach(w=>node(w[0],0,w[1],w[2],[w[3]]));
+function inPoly(x,y,P){let c=false;for(let i=0,j=P.length-1;i<P.length;j=i++){const [xi,yi]=P[i],[xj,yj]=P[j];if(((yi>y)!==(yj>y))&&(x<(xj-xi)*(y-yi)/(yj-yi)+xi))c=!c;}return c;}
+function visible(a,b,room){const r=ROOMS[room];if(!r||(!r.rect&&!r.polygon))return true;const P=poly(r);for(let k=1;k<10;k++){const t=k/10;if(!inPoly(a.x+(b.x-a.x)*t,a.y+(b.y-a.y)*t,P))return false;}return true;}
+function linkRoomNodes(){
+  for(let i=0;i<N.length;i++)for(let j=i+1;j<N.length;j++){const a=N[i],b=N[j];if(a.f!==b.f)continue;if(a.rooms.some(r=>b.rooms.includes(r)&&visible(a,b,r))&&!E.some(e=>(e[0]===a.id&&e[1]===b.id)||(e[0]===b.id&&e[1]===a.id)))E.push([a.id,b.id,Math.hypot(a.x-b.x,a.y-b.y),'walk']);}
+}
+linkRoomNodes();
+window.__dbg={get M(){return M},route:(a,b)=>route(a,b)};
+const NBYID={};N.forEach(n=>NBYID[n.id]=n);
+function route(from,to){
+  // from/to: {f,x,y,room}
+  const tmp=[{id:'_A',f:from.f,x:from.x,y:from.y,rooms:[from.room]},{id:'_B',f:to.f,x:to.x,y:to.y,rooms:[to.room]}];
+  const nodes=N.concat(tmp); const by={};nodes.forEach(n=>by[n.id]=n);
+  const adj={};const add=(a,b,w,t)=>{(adj[a]=adj[a]||[]).push([b,w,t]);(adj[b]=adj[b]||[]).push([a,w,t]);};
+  E.forEach(([a,b,w,t])=>add(a,b,w,t));
+  tmp.forEach(t=>N.forEach(n=>{if(n.f===t.f&&n.rooms.includes(t.rooms[0])&&visible(t,n,t.rooms[0]))add(t.id,n.id,Math.hypot(n.x-t.x,n.y-t.y),'walk');}));
+  if(from.f===to.f&&from.room===to.room&&visible(from,to,from.room))add('_A','_B',Math.hypot(from.x-to.x,from.y-to.y),'walk');
+  const dist={},prev={},seen=new Set();nodes.forEach(n=>dist[n.id]=Infinity);dist._A=0;
+  while(true){let u=null;for(const k in dist)if(!seen.has(k)&&(u===null||dist[k]<dist[u]))u=k;if(u===null||dist[u]===Infinity)break;seen.add(u);if(u==='_B')break;(adj[u]||[]).forEach(([v,w,t])=>{if(dist[u]+w<dist[v]){dist[v]=dist[u]+w;prev[v]=[u,t];}});}
+  if(dist._B===Infinity)return null;
+  const path=[];let c='_B';while(c){path.unshift(by[c]);c=prev[c]&&prev[c][0];}
+  const pts=path.map(n=>({f:n.f,x:n.x,y:n.y,id:n.id,rooms:n.rooms}));
+  return {pts,m:Math.round(dist._B),min:Math.max(1,Math.round(dist._B/70))};
+}
+const STAIRNAME={S1:'escadas para a Sala 5',S3:'escadas para a Sala 2',S5:'escadas para a Sala 1',S6:'escadas para a Sala de Poses',S7:'escadas da plataforma M4',S2:'escadas da cave',S4a:'escadas do lado direito da Sala 3',S4b:'escadas em L para o Mezanino 3'};
+function steps(r){
+  const out=[];let lastRoom=null;
+  for(let i=1;i<r.pts.length;i++){
+    const a=r.pts[i-1],b=r.pts[i];const sid=(b.id||'').split('_')[0];const sida=(a.id||'').split('_')[0];
+    if(sid===sida&&STAIRNAME[sid]){const up=a.f<b.f||(a.f===b.f&&b.id.endsWith('_hi'));out.push({t:(up?'Sobe as ':'Desce as ')+STAIRNAME[sid]+(a.f!==b.f?' até ao '+FLOORNAME[b.f]:''),f:a.f,up});continue;}
+    if(b.id==='P9'||a.id==='P9'){if(b.id==='P9')out.push({t:'No topo das escadas, entra na Sala 4',f:0});continue;}
+    if(b.rooms&&b.rooms.length===2&&b.id&&b.id[0]==='P'){const nr=b.rooms.find(x=>!a.rooms||!a.rooms.includes(x))||b.rooms[1];out.push({t:'Passa para '+RNAME(nr),f:b.f});}
+    if(b.id==='E1')out.push({t:'Entra pela receção',f:0});
+    if(b.id==='EXT'&&i>1)out.push({t:'Sai para o estacionamento',f:0});
+  }
+  out.push({t:'Chegaste.',f:r.pts[r.pts.length-1].f});
+  return out;
+}
+
+/* ================= state ================= */
+const store={get(k,d){try{const v=localStorage.getItem('mrbig2.'+k);return v===null?d:JSON.parse(v);}catch(e){return d;}},set(k,v){try{localStorage.setItem('mrbig2.'+k,JSON.stringify(v));}catch(e){}}};
+// future version of the plan (mock): new mezzanine over Sala 6, stairs from Sala 6
+const FUT={id:'M6',floor:1,rect:[0,55,14,38],stairs:[10.6,86,3,6]};
+const GATE={id:'q-gate',label:'Receção (cancela de entrada)',f:0,x:35.5,y:101.5,room:'0'};
+const QRS=[{id:'q-ent',label:'Entrada (estacionamento)',f:0,x:40,y:108.6,room:'C'},{id:'q-rec',label:'Receção',f:0,x:35.5,y:101,room:'0'},{id:'q-3',label:'Sala 3 · centro',f:0,x:32,y:75,room:'3'},{id:'q-4',label:'Sala 4 · junto às escadas',f:0,x:44,y:47,room:'4'},{id:'q-1',label:'Sala 1 · topo das escadas',f:0,x:55,y:97,room:'1'},{id:'q-6',label:'Sala 6',f:0,x:7,y:55.5,room:'6'},{id:'q-m3',label:'Mezanino 3 · chegada',f:1,x:41,y:56,room:'M3'}];
+const S={theme:store.get('theme','preto'),q:'',muscle:'Todos',room:'Todas',floor:0,zoom:1,pan:[0,0],sel:null,target:null,nav:false,
+  pos:store.get('pos',QRS[0]),treino:store.get('treino',[]),done:store.get('done',{}),sets:store.get('sets',{}),fromTreino:false,howto:false,stepIdx:0,big:store.get('big',[]),type:'',lang:store.get('lang','pt'),mType:'',onb:store.get('onbDay','')===new Date().toISOString().slice(0,10),
+  log:store.get('log',{}),form:{},lastMu:store.get('lastMu',''),flow:false,hist:store.get('hist',{}),lastType:store.get('lastType',{}),follows:store.get('follows',{n1:true}),planView:'futuro',pub:store.get('pub',true),m2name:store.get('m2name','Pernas II'),showSoon:store.get('showSoon',true),dateAnn:'',dateLive:'',admVer:'v2',admView:'futuro',admFloor:0};
+function save(){store.set('onbDay',S.onb?new Date().toISOString().slice(0,10):'');['theme','pos','treino','done','sets','big','follows','pub','m2name','showSoon','hist','lastType','log','lastMu','lang'].forEach(k=>store.set(k,S[k]));}
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ================= icons ================= */
+const I={home:'<path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z"/>',search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',map:'<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/>',dumb:'<path d="M6 7v10M3 9v6M18 7v10M21 9v6M6 12h12"/>',qr:'<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3"/>',nfc:'<path d="M6 8a8 8 0 0 0 0 8M9.5 6a12 12 0 0 1 0 12M13 4a15 15 0 0 1 0 16"/>',back:'<path d="M15 6l-6 6 6 6"/>',next:'<path d="M9 6l6 6-6 6"/>',theme:'<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/>',x:'<path d="M6 6l12 12M18 6 6 18"/>',pin:'<path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>',mega:'<path d="M4 10v4h3l6 4V6L7 10z"/><path d="M17 9a4 4 0 0 1 0 6"/>',key:'<circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M17 6l3 3M15 8l2 2"/>',rooms:'<rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="M12 3.5v7M3.5 12h7M12 14v6.5M14 12h6.5"/>',list:'<path d="M10 6h10M10 12h10M10 18h10"/><path d="M3.5 6l1.5 1.5L7.5 5M3.5 12l1.5 1.5 2.5-2.5M3.5 18l1.5 1.5 2.5-2.5"/>',photo:'<rect x="3" y="5" width="18" height="14" rx="1"/><circle cx="9" cy="11" r="2"/><path d="m21 16-5-5-9 8"/>'};
+const ic=(n,s=22,w=2.2)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[n]}</svg>`;
+
+/* ================= map renderer ================= */
+const VB=[-3,2,78,126];const VB0=VB;
+const WALLW=0.28;
+function stairsSVG(L,level,onlyFirst){
+  let s='';const C='var(--stair)';
+  const rectS=(x,y,w,h)=>{let t=`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="var(--bg)" stroke="${C}" stroke-width="0.14"/>`;const n=Math.max(3,Math.round(Math.max(w,h)/0.6));for(let i=1;i<n;i++){if(h>=w){const yy=y+h*i/n;t+=`<line x1="${x}" y1="${yy}" x2="${x+w}" y2="${yy}" stroke="${C}" stroke-width="0.06"/>`;}else{const xx=x+w*i/n;t+=`<line x1="${xx}" y1="${y}" x2="${xx}" y2="${y+h}" stroke="${C}" stroke-width="0.06"/>`;}}return t;};
+  if(L.path){let pts=L.path.map(p=>p.slice());if(L.groundEnd!=null&&level===0)pts[pts.length-1][1]=L.groundEnd;if(onlyFirst)pts=pts.slice(0,2);
+    for(let i=1;i<pts.length;i++){const a=pts[i-1],b=pts[i],w=L.width;if(a[1]===b[1])s+=rectS(Math.min(a[0],b[0]),a[1]-w/2,Math.abs(a[0]-b[0]),w);else s+=rectS(a[0]-w/2,Math.min(a[1],b[1]),w,Math.abs(a[1]-b[1]));}
+    let line=pts.slice();if(L.up==='start')line.reverse();const down=updown(L,level)==='▼';if(down)line.reverse();
+    s+=arrow(line,down);
+  }else if(L.rect){const [x,y,w,h]=L.rect;s+=rectS(x,y,w,h);if(L.up){const cx=x+w/2,cy=y+h/2;const e={N:[[cx,y+h-.3],[cx,y+.3]],S:[[cx,y+.3],[cx,y+h-.3]],E:[[x+.3,cy],[x+w-.3,cy]],W:[[x+w-.3,cy],[x+.3,cy]]}[L.up];const down=updown(L,level)==='▼';s+=arrow(down?e.slice().reverse():e,down);}}
+  return s;
+}
+function updown(L,level){if(L.toFloor==null)return '▲';if(L.floor===level)return L.toFloor>level?'▲':'▼';return level>L.floor?'▼':'▲';}
+function arrow(pts,down){const col=down?'var(--accent-text)':'var(--up)';const p=pts.map(q=>q.join(',')).join(' ');const [ax,ay]=pts[pts.length-2],[bx,by]=pts[pts.length-1];const ang=Math.atan2(by-ay,bx-ax);const s=0.9;
+  const h=`${bx},${by} ${bx-s*Math.cos(ang-0.5)},${by-s*Math.sin(ang-0.5)} ${bx-s*Math.cos(ang+0.5)},${by-s*Math.sin(ang+0.5)}`;
+  const [sx,sy]=pts[0];
+  return `<polyline points="${p}" fill="none" stroke="${col}" stroke-width="0.22"/><polygon points="${h}" fill="${col}"/><rect x="${sx-0.75}" y="${sy-0.75}" width="1.5" height="1.5" rx="0.25" fill="${col}"/><text x="${sx}" y="${sy+0.45}" text-anchor="middle" font-size="1.1" fill="#FFFFFF" font-family="Arial">${down?'▼':'▲'}</text>`;}
+function stadium(x,y,w,h,n){n=n||72;const r=w/2,cx=x+r,top=y+r,bot=y+h-r,p=[];for(let i=0;i<=n/2;i++){const a=Math.PI+Math.PI*i/(n/2);p.push([cx+r*Math.cos(a),top+r*Math.sin(a)]);}for(let i=0;i<=n/2;i++){const a=Math.PI*i/(n/2);p.push([cx+r*Math.cos(a),bot+r*Math.sin(a)]);}return p;}
+const FILLK={sala:'var(--room)',entrada:'var(--room-entr)',corredor:'var(--room-corr)',mezanino:'var(--room-mez)',cave:'var(--room-cave)'};
+const P2=pts=>pts.map(p=>p.join(',')).join(' ');
+function label(r,fs){const [x,y]=LABELPOS[r.id]||[0,0];const txt=(r.id==='C'?'Corredor entrada / saída':r.name).toUpperCase();
+  if(r.id==='2'||r.id==='8')return `<text x="${x}" y="${y}" transform="rotate(-90 ${x} ${y})" text-anchor="middle" font-size="${fs*0.85}" fill="var(--fg)" font-family="var(--display)" font-weight="700" letter-spacing=".05">${txt}</text>`;
+  return `<text x="${x}" y="${y}" text-anchor="middle" font-size="${r.id==='7'||r.id==='C'?fs*0.6:fs}" fill="var(--fg)" font-family="var(--display)" font-weight="700" letter-spacing=".05">${txt}</text>`;}
+/* machine availability (mock): green free, orange someone on the way, red in use */
+const STN={free:'Livre',go:'A caminho',busy:'Ocupada'};
+function status(m){if(S.nav&&S.target===m.code)return 'go';let h=0;const k=m.code+'|'+Math.floor(Date.now()/600000);for(let i=0;i<k.length;i++)h=(h*31+k.charCodeAt(i))>>>0;const r=(h%100)/100;return r<0.62?'free':r<0.76?'go':'busy';}
+const stDot=m=>{const s=status(m);return `<span class="st"><i style="background:var(--st-${s})"></i>${STN[s]}</span>`;};
+/* route drawn with straight lines and 90° turns only */
+const DOORDIR={};PLAN.links.filter(L=>L.wall).forEach(L=>{const [[x1,y1],[x2,y2]]=L.wall;DOORDIR[L.id]=x1===x2?'h':'v';});
+function inRooms(x,y,rooms){return rooms.some(id=>{const r=ROOMS[id];return r&&(r.rect||r.polygon)&&inPoly(x,y,poly(r));});}
+function legOK(a,b,rooms){for(let k=1;k<12;k++){const t=k/12;if(!inRooms(a.x+(b.x-a.x)*t,a.y+(b.y-a.y)*t,rooms))return false;}return true;}
+function ortho(a,b){
+ if(Math.abs(a.x-b.x)<0.05||Math.abs(a.y-b.y)<0.05)return [b];
+ const rooms=[...new Set((a.rooms||[]).concat(b.rooms||[]))];
+ const da=DOORDIR[a.id],db=DOORDIR[b.id];const H={x:b.x,y:a.y},V={x:a.x,y:b.y};
+ let cands=[];
+ if(da==='h'&&db==='h'){const mx=(a.x+b.x)/2;cands.push([{x:mx,y:a.y},{x:mx,y:b.y}]);}
+ if(da==='v'&&db==='v'){const my=(a.y+b.y)/2;cands.push([{x:a.x,y:my},{x:b.x,y:my}]);}
+ if(da==='h'||db==='v')cands.push([H]);if(da==='v'||db==='h')cands.push([V]);
+ cands.push([H],[V]);
+ for(const c of cands){const seq=[a].concat(c,[b]);let ok=true;for(let i=1;i<seq.length;i++)if(!legOK(seq[i-1],seq[i],rooms)){ok=false;break;}if(ok)return c.concat([b]);}
+ return cands[0].concat([b]);}
+function pill(x,y,txt,col,k,act,v){const w=txt.length*k*0.42+k*1.2,h=k*0.9;return `<g ${act?`data-act="${act}" data-v="${v}" style="cursor:pointer"`:''}><rect x="${x-w/2}" y="${y-h-k*0.5}" width="${w}" height="${h}" rx="${h/2}" fill="${col}" stroke="#FFFFFF" stroke-width="${k*0.06}"/><text x="${x}" y="${y-k*0.5-h*0.28}" text-anchor="middle" font-size="${h*0.58}" fill="#FFFFFF" font-family="var(--display)" font-weight="700" letter-spacing=".04">${txt}</text></g>`;}
+function routeSVG(route,level){
+ const k=4.2/Math.pow(S.zoom,0.5);let s='',lines=[],cur=null,marks='';const pts=route.pts;
+ const flush=()=>{if(cur&&cur.length>1)lines.push(cur);cur=null;};
+ for(let i=1;i<pts.length;i++){const a=pts[i-1],b=pts[i];const sa=(a.id||'').split('_')[0],sb=(b.id||'').split('_')[0];
+  const stair=sa&&sa===sb&&/^S/.test(sa)&&/_(lo|hi)$/.test(a.id||'')&&/_(lo|hi)$/.test(b.id||'');
+  if(stair){const up=(b.id.endsWith('_hi'));const col=up?'var(--up)':'var(--accent)';flush();
+   if(a.f===level&&b.f===level){s+=`<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="${col}" stroke-width="0.8" stroke-linecap="round"/>`;marks+=pill((a.x+b.x)/2,Math.min(a.y,b.y),up?'▲ SOBE':'▼ DESCE',col,k);}
+   else if(a.f===level){marks+=pill(a.x,a.y,(up?'▲ SOBE AO PISO ':'▼ DESCE AO PISO ')+(b.f===-1?'−1':b.f),col,k,'floor',b.f);s+=`<circle cx="${a.x}" cy="${a.y}" r="0.7" fill="${col}"/>`;}
+   else if(b.f===level){marks+=pill(b.x,b.y,(up?'▲ VENS DO PISO ':'▼ VENS DO PISO ')+(a.f===-1?'−1':a.f),col,k,'floor',a.f);s+=`<circle cx="${b.x}" cy="${b.y}" r="0.7" fill="${col}"/>`;cur=[{x:b.x,y:b.y}];}
+   continue;}
+  if(a.f!==level||b.f!==level){flush();continue;}
+  if(!cur)cur=[{x:a.x,y:a.y}];ortho(a,b).forEach(p=>cur.push(p));}
+ flush();
+ lines.forEach(L=>{const p=L.map(q=>q.x.toFixed(2)+','+q.y.toFixed(2)).join(' ');s+=`<polyline points="${p}" fill="none" stroke="var(--bg)" stroke-width="1.2" stroke-linejoin="miter"/><polyline class="route" points="${p}" fill="none" stroke="var(--accent-text)" stroke-width="0.6" stroke-dasharray="1.2 0.8" stroke-linejoin="miter"/>`;});
+ return s+marks;}
+function mapSVG(level,opts){
+  opts=opts||{};
+  const vb=opts.vb||viewBox();
+  let s=`<svg ${opts.static?'':'id="mapsvg"'} viewBox="${vb.join(' ')}" preserveAspectRatio="xMidYMid meet" role="group" aria-label="Planta ${esc(FLOORNAME[level])}">`;
+  const ground=PLAN.rooms.filter(r=>r.floor===0);
+  if(level===0){const o=PLAN.outside[0];const [x,y,w,h]=o.rect;s+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="var(--park)"/>`;o.rows.forEach(row=>{const n=row.spaces,sw=w/n;for(let i=0;i<=n;i++)s+=`<line x1="${x+i*sw}" y1="${row.y}" x2="${x+i*sw}" y2="${row.y+row.depth}" stroke="var(--wall)" stroke-width="0.1"/>`;const yy=row.side==='norte'?row.y+row.depth:row.y;s+=`<line x1="${x}" y1="${yy}" x2="${x+w}" y2="${yy}" stroke="var(--wall)" stroke-width="0.1"/>`;});
+    s+=`<text x="${x+w/2}" y="${(o.aisle[0]+o.aisle[1])/2+0.6}" text-anchor="middle" font-size="1.7" fill="var(--fg)" font-family="var(--display)" font-weight="700">P · ESTACIONAMENTO</text>`;}
+  else ground.forEach(r=>{s+=`<polygon points="${P2(poly(r))}" fill="none" stroke="var(--ghost)" stroke-width="0.15"/>`;});
+  const here=PLAN.rooms.filter(r=>r.floor===level&&r.kind!=='pista');
+  PLAN.rooms.filter(r=>r.floor===level&&r.kind==='pista').forEach(r=>{const t=r.stadium;const o=stadium(t.x,t.y,t.w,t.h),i=stadium(t.x+t.width,t.y+t.width,t.w-2*t.width,t.h-2*t.width);
+    s+=`<polygon points="${P2(o)}" fill="var(--room-mez)" stroke="var(--wall)" stroke-width="${WALLW}"/><polygon points="${P2(i)}" fill="var(--bg)" stroke="var(--wall)" stroke-width="0.14"/><polygon points="${P2(stadium(t.x+t.width/2,t.y+t.width/2,t.w-t.width,t.h-t.width))}" fill="none" stroke="var(--muted)" stroke-width="0.1" stroke-dasharray="0.8 0.8"/><text x="${t.x+t.w/2}" y="${t.y+1.9}" text-anchor="middle" font-size="1.3" fill="var(--fg)" font-family="var(--display)" font-weight="700">PISTA</text>`;});
+  here.forEach(r=>{s+=`<polygon class="rm" data-act="room" data-r="${r.id}" points="${P2(poly(r))}" fill="${FILLK[r.kind]}" stroke="var(--wall)" stroke-width="${WALLW}" stroke-linejoin="miter"/>`;});
+  if(level===0)PLAN.links.filter(L=>L.wall).forEach(L=>{const [[x1,y1],[x2,y2]]=L.wall;const pad=WALLW;const fill=FILLK[(ROOMS[L.rooms[0]]||{}).kind]||'var(--room)';
+    if(x1===x2)s+=`<rect x="${x1-pad}" y="${Math.min(y1,y2)+pad/2}" width="${pad*2}" height="${Math.abs(y2-y1)-pad}" fill="${fill}"/>`;else s+=`<rect x="${Math.min(x1,x2)+pad/2}" y="${y1-pad}" width="${Math.abs(x2-x1)-pad}" height="${pad*2}" fill="${fill}"/>`;});
+  PLAN.links.filter(L=>!L.wall).forEach(L=>{if(L.floor===level)s+=stairsSVG(L,level,false);else if(L.toFloor===level)s+=stairsSVG(L,level,false);});
+  here.concat(level!==0?[]:[]).forEach(r=>{if(r.kind==='entrada'||r.kind==='sala'||r.kind==='corredor'||r.kind==='mezanino'||r.kind==='cave')s+=label(r,2.1);});
+  if(level!==0)ground.forEach(r=>{const [x,y]=LABELPOS[r.id]||[0,0];if(r.id==='C'||r.id==='0')return;s+=`<text x="${x}" y="${y}" text-anchor="middle" font-size="1.2" fill="var(--ghost)" font-family="var(--display)" font-weight="700">${esc(r.name.toUpperCase())}</text>`;});
+  if(opts.future&&level===1){const [x,y,w,h]=FUT.rect;
+    s+=`<rect x="${x+0.4}" y="${y+0.4}" width="${w-0.8}" height="${h-0.8}" fill="color-mix(in srgb,var(--accent) 22%,transparent)" stroke="var(--accent-text)" stroke-width="0.45" stroke-dasharray="1.4 0.9"/>
+     <text x="${x+w/2}" y="${y+h/2-1.2}" text-anchor="middle" font-size="2.2" fill="var(--fg)" font-family="var(--display)" font-weight="700">NOVO</text>
+     <text x="${x+w/2}" y="${y+h/2+1.6}" text-anchor="middle" font-size="1.9" fill="var(--fg)" font-family="var(--display)" font-weight="700">${esc(S.m2name.toUpperCase())}</text>`;
+    const [sx,sy,sw,sh]=FUT.stairs;s+=`<rect x="${sx}" y="${sy}" width="${sw}" height="${sh}" fill="none" stroke="var(--accent-text)" stroke-width="0.25" stroke-dasharray="0.6 0.4"/>`;}
+  // machines
+  const list=M.filter(m=>m.f===level);const EMOJI_MAP=S.zoom>=2.2;
+  list.forEach(m=>{const on=S.pop===m.code||S.target===m.code;const inT=S.treino.includes(m.code);
+    const stc=`var(--st-${status(m)})`;
+    if(EMOJI_MAP&&!opts.static)s+=`<g class="mc" data-act="mdot" data-c="${m.code}" style="cursor:pointer"><circle cx="${m.x}" cy="${m.y}" r="${on?1.05:0.82}" fill="var(--surf)" stroke="${stc}" stroke-width="${on?0.34:0.24}"/>${on?`<circle cx="${m.x}" cy="${m.y}" r="1.4" fill="none" stroke="var(--fg)" stroke-width="0.16"/>`:''}<svg x="${m.x-(on?0.66:0.52)}" y="${m.y-(on?0.66:0.52)}" width="${on?1.32:1.04}" height="${on?1.32:1.04}" viewBox="0 0 24 24" fill="none" stroke="var(--fg)" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">${IC[m.muscle]||IC.Outros}</svg></g>`;
+    else s+=`<g class="mc" data-act="mdot" data-c="${m.code}" style="cursor:pointer"><circle cx="${m.x}" cy="${m.y}" r="1.5" fill="transparent"/><rect x="${m.x-(on?0.7:0.5)}" y="${m.y-(on?0.7:0.5)}" width="${on?1.4:1}" height="${on?1.4:1}" rx="0.25" fill="${stc}" stroke="${on?'var(--fg)':inT?'var(--fg)':'none'}" stroke-width="${on?0.3:0.16}"/></g>`;});
+  // route
+  if(!opts.static){const k=2.4/Math.pow(S.zoom,0.5);STAIR_UI.forEach(([f,x,y,txt,up,ti])=>{if(f===level)s+=pill(x,y+k*0.4,txt,up?'var(--up)':'var(--accent)',k,'stair',ti);});}
+  if(opts.route)s+=routeSVG(opts.route,level);
+  if(!opts.static&&S.pos.f===level){const k=6/Math.pow(S.zoom,0.5),x=S.pos.x,y=S.pos.y,hy=y-k*0.95,r=k*0.42;
+    const lw=k*3.9,lh=k*0.78,ly=hy-r-k*0.25-lh;
+    s+=`<g class="pin" aria-label="Estás aqui"><ellipse cx="${x}" cy="${y}" rx="${k*0.32}" ry="${k*0.12}" fill="#000000" opacity=".45"/>
+     <path d="M${x} ${y} L${x-r*0.86} ${hy+r*0.5} A${r} ${r} 0 1 1 ${x+r*0.86} ${hy+r*0.5} Z" fill="var(--accent)" stroke="#FFFFFF" stroke-width="${k*0.07}"/>
+     <circle cx="${x}" cy="${hy}" r="${r*0.4}" fill="#FFFFFF"/>
+     <rect x="${x-lw/2}" y="${ly}" width="${lw}" height="${lh}" rx="${lh*0.2}" fill="var(--fg)"/>
+     <text x="${x}" y="${ly+lh*0.74}" text-anchor="middle" font-size="${lh*0.68}" fill="var(--bg)" font-family="var(--display)" font-weight="700" letter-spacing=".04">ESTÁS AQUI</text></g>`;}
+  return s+'</svg>';
+}
+function viewBox(){const z=S.zoom;const w=VB[2]/z,h=VB[3]/z;const cx=VB[0]+VB[2]/2+S.pan[0],cy=VB[1]+VB[3]/2+S.pan[1];return [cx-w/2,cy-h/2,w,h].map(v=>+v.toFixed(2));}
+function focusOn(x,y,z){S.zoom=z||2.4;S.pan=[x-(VB[0]+VB[2]/2),y-(VB[1]+VB[3]/2)];}
+function focusRoute(m,level){const r=route(S.pos,{f:m.f,x:m.x,y:m.y,room:m.room});level=level==null?S.pos.f:level;const P=r?r.pts.filter(p=>p.f===level):[];if(level===m.f)P.push({x:m.x,y:m.y});if(!P.length){focusOn(S.pos.x,S.pos.y-6,1.6);return;}
+ const xs=P.map(p=>p.x),ys=P.map(p=>p.y);const x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);focusOn((x0+x1)/2,(y0+y1)/2-4,Math.max(1,Math.min(4,VB[2]/(x1-x0+20),VB[3]/(y1-y0+30))));}
+const DC={};function distFromPos(m){const k=S.pos.id+'|'+S.pos.x+'|'+m.code;if(!(k in DC)){const r=route(S.pos,{f:m.f,x:m.x,y:m.y,room:m.room});DC[k]=r?r.m:999;}return DC[k];}
+function mcard(m,o){o=o||{};const det=o.flow?`<button class="cb ic" type="button" data-act="pick" data-c="${m.code}" aria-label="Ver detalhe da máquina">${ic('list',17,2.2)}</button>`:`<a class="cb ic" href="#${m.slug}" aria-label="Ver detalhe da máquina">${ic('list',17,2.2)}</a>`;
+ return `<div class="mcard${o.sm?' sm':''}"><a class="pic" href="#${m.slug}" ${o.flow?`data-act="pick" data-c="${m.code}"`:''} aria-label="Ver ${esc(m.nameN)}">${pic(m)}</a><div class="tx"><span class="br">${esc(m.brand)}</span><span class="nm">${esc(m.nameN)}</span><span class="mt">${esc(o.meta||(RNAME(m.room)+' · '+m.code+' · Fila '+m.row))}</span>
+  <div class="acts"><button class="cb" type="button" data-act="go" data-c="${m.code}">GO</button>${det}${lvl(m)}</div></div></div>`;}
+
+/* ================= screens ================= */
+const TABS=[['inicio','INÍCIO','home'],['maquinas','MÁQUINAS','search'],['ler','LER','qr'],['mapa','MAPA','map'],['treino','TREINO','dumb']];
+function top(title,meta,right){return `<header class="top"><img class="emb" src="${EMB}" alt=""><h1>${title}</h1>${meta?`<span class="meta">${meta}</span>`:''}${right||''}</header>`;}
+function posLine(){return `<span class="muted" style="font-size:13px">${ic('pin',14)} Estás em: <b style="color:var(--fg)">${esc(S.pos.label)}</b> · ${FLOORNAME[S.pos.f]}</span>`;}
+function vInicio(){
+  const left=S.treino.filter(c=>!S.done[c]).length;
+  return `<div class="scr"><header class="top plain"><img class="emb lg" src="${EMB}" alt="Mr Big Evolution"><div class="brand"><b>Mr Big</b><span>Evolution</span></div>
+   ${langSeg()}<button class="icon-btn" type="button" data-act="theme" aria-label="Mudar tema">${ic('theme')}</button><a class="icon-btn acc" href="#gestor" aria-label="Modo gestor (planeador)">${ic('key')}</a></header>
+   <div class="stripes"><i></i><i></i><i></i></div>
+   <div class="body">
+    <div class="hero"><div class="eyebrow" style="color:var(--on-accent)">O MAIOR GINÁSIO DA EUROPA</div><div class="big">Treino<br>a sério.</div>
+     <div class="stats"><div><b>${M.length}</b><span>máquinas</span></div><div><b>3</b><span>pisos</span></div><div><b>10</b><span>salas</span></div></div></div>
+    ${posLine()}
+    ${S.pub&&S.showSoon?`<a class="card dash" href="#breve"><span class="eyebrow">BREVEMENTE</span><h3>Nova zona ${esc(S.m2name)} no mezanino</h3><span class="muted">Vê a planta futura e o que vai chegar</span></a>`:''}
+    ${S.treino.length?`<a class="card" href="#treino"><span class="eyebrow">O MEU TREINO</span><h3>${left?`Faltam ${left} de ${S.treino.length}`:'Treino concluído'}</h3><span class="muted">Ordem pensada para andares o mínimo</span></a>`:`<a class="card" href="#treino"><span class="eyebrow">TREINOS</span><h3>Escolhe um treino pronto</h3><span class="muted">Peito, costas, pernas, glúteos… com rota pelas salas</span></a>`}
+    <button class="btn quiet" type="button" data-act="reset-onb">Repetir a primeira entrada</button>
+   </div></div>`;}
+const langSeg=()=>`<div class="seg lang" role="group" aria-label="Idioma / Language">${[['pt','PT'],['en','EN']].map(v=>`<button type="button" data-act="lang" data-v="${v[0]}" aria-pressed="${(S.lang||'pt')===v[0]}">${v[1]}</button>`).join('')}</div>`;
+function filtered(){const q=S.q.trim().toLowerCase();return M.filter(m=>(S.muscle==='Todos'||m.muscle===S.muscle)&&(!S.mType||(S.muscle!=='Todos'&&exType(m,S.muscle)===S.mType))&&(!q||(m.nameN+' '+m.brand+' '+m.code+' '+m.muscle+' '+RNAME(m.room)+' '+CAT[m.cat].n).toLowerCase().includes(q)));}
+function results(){const L=filtered();const cnt=`<p class="muted" style="margin:0;font-size:12px">${L.length} / ${M.length} máquinas</p>`;
+  if(!L.length)return `<div class="empty"><b>Nenhuma máquina encontrada.</b><button class="btn sm ghost" type="button" data-act="clear">Limpar filtros</button></div>`;
+  const groups={};L.forEach(m=>{const k=m.room+'|'+m.row;(groups[k]=groups[k]||[]).push(m);});
+  const shown=Object.keys(groups).slice(0,40);
+  return cnt+shown.map(k=>{const [r,row]=k.split('|');const g=groups[k];return `<section class="list"><h2 class="sec-h" style="padding-top:4px">${esc(RNAME(r))} · Fila ${row}<small>${g.length}</small></h2>${g.map(m=>mcard(m,{sm:true,meta:m.code+' · '+m.muscle})).join('')}</section>`;}).join('')+(Object.keys(groups).length>40?`<p class="foot">A mostrar as primeiras 40 filas. Usa os filtros para afinar.</p>`:'')+`<p class="foot">Dados de exemplo</p>`;}
+function vMaquinas(){
+ let typeBlock='';
+ if(S.muscle&&S.muscle!=='Todos'){const tc={};M.filter(m=>m.muscle===S.muscle).forEach(m=>{const t=exType(m,S.muscle);tc[t]=(tc[t]||0)+1;});
+  if(S.mType&&!tc[S.mType])S.mType='';
+  typeBlock=tiles(Object.keys(tc).sort((a,b)=>tc[b]-tc[a]).map(t=>({v:t,label:t,icon:temo(S.muscle,t),sub:tc[t]+' máq.',on:S.mType===t})),{act:'mtype',size:'sm',label:'Tipo'});}
+ else typeBlock='<span class="muted" style="font-size:12px">Escolhe um músculo para filtrar por tipo.</span>';
+ return `<div class="scr">${top('Máquinas','',langSeg())}
+  <div class="filters"><label class="search" for="q">${ic('search',18)}<input id="q" type="search" placeholder="Nome, marca ou código (ex. 3-B07)" value="${esc(S.q)}" autocomplete="off"></label>
+   ${tiles(['Todos'].concat(MUSCLES).map(m=>({v:m,label:m,icon:MEMO[m],on:S.muscle===m})),{act:'muscle',size:'sm',label:'Músculo'})}
+   <h2 class="fsec" style="margin-top:2px"><em>2</em>Tipo<small>${S.mType?'toca outra vez para limpar':'opcional'}</small></h2>${typeBlock}</div>
+  <div class="body" id="results" style="gap:12px"></div></div>`;}
+const HOW={free:['Ajusta o banco e confirma os discos ou halteres antes de começar.','Pede a alguém para te ajudar nas cargas máximas.','Volta a pôr os pesos no sítio no fim.'],plate:['Ajusta o assento à tua altura.','Carrega os discos dos dois lados por igual.','Controla a descida, 2–3 segundos.'],sel:['Ajusta o assento e o pino da carga.','Faz 2 repetições leves de teste.','Movimento completo, sem balanço.'],cardio:['Começa com 3–5 minutos leves.','Escolhe o programa ou o nível no ecrã.','Limpa a máquina no fim.'],glute:['Ajusta os apoios à anca.','Contrai os glúteos no topo, 1 segundo.','Desce devagar.'],leg:['Alinha o joelho com o eixo da máquina.','Ajusta o rolo acima do tornozelo.','Controla a descida.'],mono:['Ajusta os ganchos à altura certa.','Pede a alguém para soltar os braços do monolift.','Usa sempre os seguranças laterais.']};
+/* Exercise guide: description, steps, common mistake and level for each kind of machine (example text, written from common coaching cues) */
+const LV={I:'Iniciante',R:'Regular',A:'Avançado'};
+const GUIDE=[
+ [/passadeira/,'I','Caminhada ou corrida em tapete motorizado. Bom para aquecer ou para cardio contínuo.',['Sobe para as laterais e liga a máquina com velocidade baixa.','Prende a mola de segurança à roupa.','Aumenta a velocidade aos poucos e mantém o corpo direito, sem agarrar as pegas.','Para reduzir, baixa a velocidade antes de parar.'],'Agarrar as pegas enquanto corres: muda a postura e reduz o esforço real.','5 min de aquecimento ou 20–30 min contínuos'],
+ [/bicicleta|spinning/,'I','Cardio de baixo impacto para as articulações, com resistência ajustável.',['Ajusta o selim à altura da anca, de pé ao lado da bicicleta.','Com o pedal em baixo, o joelho fica ligeiramente dobrado.','Começa com resistência leve e cadência estável.','Sobe a resistência por intervalos.'],'Selim baixo demais: os joelhos sobem muito e cansam cedo.','10–30 min'],
+ [/elíptica/,'I','Cardio de corpo inteiro sem impacto, braços e pernas em simultâneo.',['Sobe com os pés bem assentes nos pedais.','Agarra as pegas móveis.','Empurra e puxa com os braços enquanto pedalas.','Mantém o tronco direito e o olhar em frente.'],'Inclinar o tronco para a frente e apoiar o peso nas pegas.','15–30 min'],
+ [/remo indoor/,'R','Cardio de corpo inteiro: 60% pernas, 20% tronco, 20% braços.',['Prende os pés com a correia sobre a parte mais larga do pé.','Empurra primeiro com as pernas, depois inclina o tronco e por fim puxa a pega ao peito.','Volta pela ordem inversa: braços, tronco, pernas.','Mantém um ritmo de 24–28 remadas por minuto.'],'Puxar com os braços antes de empurrar com as pernas.','10–20 min ou 2000 m'],
+ [/escada infinita/,'R','Subida contínua de degraus. Muito exigente para glúteos e cardio.',['Sobe com a máquina parada e segura nas pegas.','Começa num nível baixo.','Pisa o degrau inteiro com o pé, sem ficar na ponta.','Mantém o tronco direito e solta as pegas quando estiveres estável.'],'Ficar pendurado nas pegas e tirar o peso das pernas.','10–20 min'],
+ [/halteres/,'R','Pesos livres para quase todos os músculos. Exige controlo e estabilidade.',['Escolhe o par de halteres e leva-os junto ao corpo até ao banco.','Senta-te ou deita-te com os halteres apoiados nas coxas.','Faz o movimento sem balanço, com a amplitude completa.','No fim, volta a pôr os halteres no suporte por ordem de peso.'],'Deixar cair os halteres no chão no fim da série.','3 séries de 8–12'],
+ [/supino.*barra|supino olímpico/,'R','Exercício base de peito com barra olímpica. Usa sempre os seguranças ou alguém a ajudar.',['Deita-te com os olhos por baixo da barra e os pés bem assentes.','Agarra a barra um pouco mais largo que os ombros.','Desce controlado até ao peito, cotovelos a cerca de 45°.','Empurra até esticar os braços, sem tirar as costas do banco.'],'Fazer ressaltar a barra no peito.','4 séries de 6–10'],
+ [/banco abdominal/,'I','Banco declinado para abdominais com o peso do corpo.',['Prende os pés por baixo dos rolos.','Cruza os braços sobre o peito.','Sobe enrolando a coluna, vértebra a vértebra.','Desce devagar, sem bater com as costas.'],'Puxar a cabeça com as mãos.','3 séries de 12–20'],
+ [/banco lombar|lombar/,'I','Extensão da lombar com o peso do corpo ou máquina.',['Ajusta o apoio para ficar à altura da anca.','Cruza os braços ou leva-os ao peito.','Desce com as costas direitas.','Sobe até o corpo ficar em linha, sem passar dessa linha.'],'Arquear demais no topo.','3 séries de 12–15'],
+ [/banco scott/,'R','Curl de bíceps com o braço apoiado, sem batota.',['Ajusta o assento para a axila ficar no topo do apoio.','Agarra a barra ou halter com as palmas para cima.','Sobe até ao ombro sem levantar os cotovelos.','Desce até quase esticar.'],'Esticar de golpe no fundo: esforça o cotovelo.','3 séries de 10–12'],
+ [/banco/,'R','Banco para trabalho com halteres ou barra, plano ou inclinado.',['Escolhe o ângulo: plano para peito médio, 30° para peito superior.','Senta-te com os pés no chão e as costas apoiadas.','Faz o exercício escolhido com controlo.','Volta o banco à posição plana no fim.'],'Inclinar demais o banco: o exercício passa para os ombros.','3 séries de 8–12'],
+ [/multipower|smith/,'R','Barra guiada em calhas. Dá estabilidade para agachamento, supino ou press.',['Ajusta os travões de segurança abaixo do ponto mais baixo do movimento.','Coloca-te por baixo da barra e roda-a para a soltar.','Faz o movimento na linha da calha.','Roda a barra para a prender nos ganchos no fim.'],'Não ajustar os travões de segurança.','4 séries de 8–10'],
+ [/powerlifting|monolift|rack de agachamento|hack squat livre/,'A','Estação de força para agachamento, supino e peso morto com cargas altas.',['Põe a barra à altura dos ombros e os seguranças logo abaixo do fundo do agachamento.','Coloca a barra sobre os trapézios e sai com dois passos.','Desce com o peito alto e os joelhos na linha dos pés.','Sobe a empurrar o chão e volta a pousar a barra nos ganchos.'],'Treinar pesado sem seguranças ou sem alguém a ajudar.','5 séries de 3–5'],
+ [/barra de elevações/,'A','Elevações com o peso do corpo. Costas e bíceps.',['Agarra a barra um pouco mais largo que os ombros.','Começa pendurado com os braços esticados.','Puxa até o queixo passar a barra, peito em direção à barra.','Desce controlado até esticar.'],'Balançar o corpo para ganhar impulso.','4 séries até à falha técnica'],
+ [/paralelas de dips/,'A','Dips com o peso do corpo. Tríceps e peito.',['Sobe com os braços esticados e os ombros baixos.','Desce até os cotovelos fazerem 90°.','Tronco direito para tríceps, inclinado para peito.','Empurra até esticar.'],'Descer demais e forçar os ombros.','3 séries de 8–12'],
+ [/pec deck|peck fly|crossover|wide chest/,'I','Aberturas de peito com trajeto guiado. Isola o peito sem esforço dos tríceps.',['Ajusta o assento para as pegas ficarem à altura do peito.','Costas bem apoiadas e cotovelos ligeiramente dobrados.','Junta as pegas à frente do peito, devagar.','Volta até sentires o peito alongar, sem passar a linha dos ombros.'],'Abrir demais e puxar o ombro para trás.','3 séries de 12–15'],
+ [/chest press|iso-lateral (decline|incline) press|super incline|chest press convergente/,'R','Press de peito em máquina. Trajeto convergente parecido com o supino.',['Ajusta o assento para as pegas ficarem a meio do peito.','Costas e cabeça apoiadas, omoplatas juntas.','Empurra até quase esticar os braços.','Volta devagar até sentir o peito alongar.'],'Tirar as costas do encosto para empurrar mais peso.','3 séries de 8–12'],
+ [/puxada|pulldown/,'I','Puxada vertical para as costas. Alternativa guiada às elevações.',['Ajusta o rolo para prender bem as coxas.','Agarra a barra mais largo que os ombros.','Puxa a barra ao topo do peito, cotovelos para baixo.','Sobe controlado até esticar os braços.'],'Puxar para trás da nuca ou balançar o tronco.','3 séries de 10–12'],
+ [/remada t/,'A','Remada com barra em T e muito peso livre. Exige costas estáveis.',['Põe os pés na plataforma e dobra a anca com as costas direitas.','Agarra as pegas com os braços esticados.','Puxa até ao abdómen juntando as omoplatas.','Desce sem arredondar a lombar.'],'Arredondar a lombar no fundo.','4 séries de 8–10'],
+ [/remada|row|remo baixo/,'R','Remada para a espessura das costas.',['Ajusta o apoio do peito ou o assento para chegares às pegas com os braços esticados.','Peito alto e ombros para baixo.','Puxa os cotovelos para trás e junta as omoplatas.','Volta devagar até esticar.'],'Puxar com os braços e esquecer as omoplatas.','3 séries de 10–12'],
+ [/pullover/,'R','Pullover para o grande dorsal, com o braço quase esticado.',['Ajusta o assento para o ombro ficar alinhado com o eixo.','Agarra a barra ou corda por cima da cabeça.','Puxa em arco até às coxas com os braços quase esticados.','Volta devagar sem perder a tensão.'],'Dobrar demais os cotovelos e transformar em tríceps.','3 séries de 12'],
+ [/shrug/,'R','Encolhimentos para o trapézio.',['Agarra as pegas com os braços ao lado do corpo.','Sobe os ombros em direção às orelhas.','Segura 1 segundo em cima.','Desce devagar.'],'Rodar os ombros: só sobe e desce.','3 séries de 12–15'],
+ [/press de ombro com barra/,'A','Press militar com barra livre. Ombros e tríceps, exige core firme.',['Tira a barra do suporte à altura do peito.','Pés à largura da anca, glúteos e abdominais contraídos.','Empurra a barra acima da cabeça, passando junto ao rosto.','Desce até ao queixo, controlado.'],'Arquear a lombar para empurrar.','4 séries de 6–8'],
+ [/press de ombro|shoulder press|press militar|press de ombro na polia/,'I','Press de ombro guiado, sem precisar de equilibrar a carga.',['Ajusta o assento para as pegas ficarem à altura dos ombros.','Costas bem apoiadas.','Empurra até esticar os braços.','Desce até à altura do queixo, sem deixar a carga bater.'],'Assento baixo demais: força os ombros no fundo.','3 séries de 8–12'],
+ [/elevação lateral na polia|elevação frontal na polia/,'R','Elevação com cabo: tensão constante em todo o movimento.',['Prende a pega à polia baixa e fica de lado para a máquina.','Agarra com a mão mais afastada.','Sobe o braço até à altura do ombro, cotovelo ligeiramente dobrado.','Desce devagar.'],'Pôr peso demais e balançar o corpo.','3 séries de 12–15 por braço'],
+ [/elevação lateral|lateral raise/,'I','Isola a parte lateral do ombro.',['Ajusta o assento para o ombro ficar alinhado com o eixo.','Apoia os braços nos rolos.','Sobe até à altura dos ombros.','Desce devagar, sem deixar a carga bater.'],'Encolher os ombros ao subir.','3 séries de 12–15'],
+ [/elevação frontal/,'I','Isola a parte da frente do ombro.',['Ajusta a altura para os braços começarem junto às coxas.','Agarra as pegas com os braços quase esticados.','Sobe à frente até à altura dos ombros.','Desce controlado.'],'Subir acima da cabeça: passa a usar o trapézio.','3 séries de 12'],
+ [/deltóide posterior|face pull|rotação/,'R','Parte de trás do ombro e postura.',['Ajusta as pegas ou a corda à altura dos ombros.','Puxa abrindo os braços para trás.','Junta as omoplatas no fim.','Volta devagar.'],'Usar peso demais e puxar com as costas.','3 séries de 15'],
+ [/remada alta/,'R','Remada vertical para ombros e trapézio.',['Agarra a barra ou corda com as mãos à largura dos ombros.','Puxa junto ao corpo até ao peito.','Cotovelos acima das mãos.','Desce devagar.'],'Subir acima do peito e apertar os ombros.','3 séries de 12'],
+ [/curl martelo|antebraço/,'I','Curl com pega neutra para bíceps e antebraço.',['Agarra a corda ou as pegas com as palmas viradas uma para a outra.','Cotovelos junto ao corpo.','Sobe até ao ombro.','Desce controlado.'],'Mexer os cotovelos para a frente.','3 séries de 12'],
+ [/curl/,'I','Curl de bíceps guiado.',['Ajusta o assento para o cotovelo ficar no eixo da máquina.','Agarra as pegas com as palmas para cima.','Sobe até à contração máxima.','Desce até quase esticar.'],'Balançar o tronco.','3 séries de 10–12'],
+ [/tríceps|dips/,'I','Extensão de cotovelo para os tríceps.',['Ajusta o assento ou a polia para os cotovelos ficarem fixos.','Cotovelos junto ao corpo.','Estica os braços completamente.','Volta devagar até 90°.'],'Abrir os cotovelos durante o movimento.','3 séries de 12'],
+ [/extensão de pernas/,'I','Isola o quadricípite.',['Ajusta o encosto para o joelho ficar no eixo da máquina.','Rolo logo acima do tornozelo.','Estica as pernas e segura 1 segundo.','Desce devagar.'],'Dar impulso com a anca.','3 séries de 12–15'],
+ [/nordic curl/,'A','Isquiotibiais com o peso do corpo. Muito exigente.',['Ajoelha com os calcanhares presos.','Corpo em linha da cabeça ao joelho.','Desce para a frente o mais devagar possível.','Usa as mãos para amortecer e volta.'],'Dobrar a anca e perder a linha do corpo.','3 séries de 4–6'],
+ [/leg curl/,'I','Isola os isquiotibiais.',['Ajusta o rolo para ficar acima do calcanhar.','Joelho alinhado com o eixo.','Puxa o calcanhar em direção ao glúteo.','Volta devagar.'],'Levantar a anca do banco.','3 séries de 12'],
+ [/gémeos|tibialis/,'I','Isola a barriga da perna.',['Ajusta os ombros ou os joelhos por baixo dos apoios.','Coloca a ponta dos pés no degrau.','Sobe o mais alto possível e segura 1 segundo.','Desce até sentir alongar.'],'Fazer repetições curtas e rápidas.','4 séries de 15'],
+ [/leg press horizontal/,'I','Leg press sentado, guiado e seguro para começar.',['Ajusta o encosto para os joelhos fazerem 90° no início.','Pés à largura da anca a meio da plataforma.','Empurra sem trancar os joelhos.','Volta controlado.'],'Esticar os joelhos até trancar.','3 séries de 12'],
+ [/leg press/,'R','Leg press a 45°: quadricípite e glúteos com carga alta.',['Senta-te com as costas e a anca bem apoiadas.','Pés à largura dos ombros a meio da plataforma.','Solta os travões e desce até os joelhos fazerem cerca de 90°.','Empurra sem trancar os joelhos e volta a travar no fim.'],'Descer demais e levantar a anca do assento.','4 séries de 10–12'],
+ [/hack squat|pendulum|v-squat|belt squat/,'A','Agachamento guiado com carga alta. Muito quadricípite.',['Ombros por baixo dos apoios e costas encostadas.','Pés à largura da anca, um pouco à frente.','Solta o travão e desce até os joelhos passarem 90°.','Sobe a empurrar com o pé inteiro e trava no fim.'],'Tirar os calcanhares da plataforma.','4 séries de 8–10'],
+ [/lunge/,'R','Afundo guiado para pernas e glúteos.',['Ajusta os apoios aos ombros.','Põe um pé à frente e outro atrás.','Desce até o joelho de trás quase tocar no chão.','Sobe a empurrar com o pé da frente.'],'Deixar o joelho da frente cair para dentro.','3 séries de 10 por perna'],
+ [/reverse hyper/,'A','Extensão da anca com as pernas soltas. Glúteos e lombar.',['Deita-te de barriga para baixo com a anca na beira.','Agarra as pegas.','Sobe as pernas até ficarem em linha com o tronco.','Desce controlado, sem balanço.'],'Usar o balanço do pêndulo.','3 séries de 12'],
+ [/thrust|glute drive/,'R','Extensão da anca com carga. O melhor exercício de glúteos.',['Encosta a parte de cima das costas ao apoio.','Pés à largura da anca e cinto ou almofada na anca.','Sobe a anca até o corpo ficar em linha e aperta os glúteos.','Desce sem tocar no chão.'],'Arquear a lombar em vez de subir a anca.','4 séries de 8–12'],
+ [/abdutora|adutora/,'I','Abertura ou fecho das pernas sentado.',['Ajusta a amplitude inicial.','Costas apoiadas e pernas nos apoios.','Abre ou fecha as pernas devagar.','Segura 1 segundo e volta.'],'Usar impulso com o tronco.','3 séries de 15'],
+ [/kickback|coice|glúteo em pé/,'I','Extensão da anca de pé ou de joelhos. Isola o glúteo.',['Apoia o peito ou as mãos na máquina.','Encaixa o calcanhar ou o tornozelo no apoio.','Empurra para trás e para cima com o glúteo.','Volta devagar.'],'Arquear a lombar no fim.','3 séries de 12 por perna'],
+ [/abdominal/,'I','Abdominal guiado com carga ajustável.',['Ajusta o assento e prende os pés.','Agarra as pegas junto ao peito.','Enrola o tronco para a frente.','Volta devagar.'],'Puxar com os braços.','3 séries de 15'],
+ [/estação multi-polia|estrutura de polias/,'R','Estação de cabos para dezenas de exercícios: peito, costas, ombros e braços.',['Escolhe a altura da polia e o acessório (barra, corda ou pega).','Ajusta a carga com o pino.','Coloca-te à distância certa para o cabo ficar esticado no início.','Faz o exercício com tensão constante e volta devagar.'],'Deixar a carga bater entre repetições.','3 séries de 12'],
+ [/polia|cabos/,'R','Exercício em cabo com tensão constante.',['Escolhe a altura da polia e o acessório.','Ajusta a carga com o pino.','Faz o movimento completo sem balançar.','Volta devagar.'],'Pôr peso a mais e usar o corpo todo.','3 séries de 12']
+];
+const LV_DEF={cardio:'I',sel:'I',glute:'I',leg:'I',plate:'R',free:'R',mono:'A'};
+function guide(m){const n=m.name.toLowerCase();for(const g of GUIDE)if(g[0].test(n)){let lv=g[1];if(m.cat==='plate'&&lv==='I')lv='R';return {lv,desc:g[2],steps:g[3],err:g[4],sets:g[5]};}
+ return {lv:LV_DEF[m.cat]||'R',desc:'Máquina de '+m.muscle.toLowerCase()+'.',steps:HOW[m.cat]||[],err:'Movimento rápido e sem controlo.',sets:'3 séries de 10–12'};}
+const lvl=m=>{const l=guide(m).lv;return `<span class="lvl lvl-${l}">${LV[l]}</span>`;};
+
+function vMaquina(code){const m=BYCODE[code];if(!m)return vMaquinas();
+  const r=route(S.pos,{f:m.f,x:m.x,y:m.y,room:m.room});const inT=S.treino.includes(code);
+  const alts=M.filter(x=>x.code!==code&&x.muscle===m.muscle).map(x=>({x,d:x.f===m.f?Math.hypot(x.x-m.x,x.y-m.y):99})).sort((a,b)=>a.d-b.d).slice(0,3);
+  const here=S.pos.code===code;const G=guide(m);
+  return `<div class="scr"><div class="body" style="padding:0;gap:0">
+   <div class="photo" style="background:#FFFFFF;color:#555;height:240px"><svg viewBox="0 0 64 64" style="width:128px;height:128px" aria-hidden="true">${PICS[picKey(m)]}</svg>${PHOTO[photoKey(m)]?`<img src="${PHOTOD[photoKey(m)]||PHOTO[photoKey(m)][0]}" alt="${esc(m.nameN)}" referrerpolicy="no-referrer" onerror="this.remove()">`:''}<button class="icon-btn" type="button" data-act="back" aria-label="Voltar">${ic('back')}</button></div>
+   <div class="stripes"><i></i><i></i><i></i></div>
+   <div style="display:flex;flex-direction:column;gap:14px;padding-top:16px;padding-bottom:24px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))">
+    <span class="credit">${credit(m)}</span>
+    ${S.flow?stepper(3):''}
+    <div style="display:flex;flex-direction:column;gap:6px"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="eyebrow">${esc(m.brand.toUpperCase())} · ${esc(CAT[m.cat].n.toUpperCase())}</span>${lvl(m)}</div>
+     <h1 class="title-xl">${esc(m.nameN)}</h1>
+     <p style="margin:0;font-size:15px">${esc(G.desc)}</p>
+     <div class="tags"><span class="tag on">${esc(m.muscle)}</span></div></div>
+    <div class="kv"><div><span>CÓDIGO</span><b>${m.code}</b></div><div><span>SALA</span><b>${esc(RNAME(m.room))}</b></div><div><span>FILA · POS.</span><b>${m.row} · ${m.pos}</b></div></div>
+    <button class="btn go" type="button" data-act="go-map" data-c="${code}">${here?'Ver no mapa':'GO'}<span style="font:400 14px var(--body);text-transform:none;letter-spacing:0;opacity:.9">${here?'':r?`≈ ${r.m} m · ${r.min} min`:''}</span></button>
+    <div class="card guide"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span class="eyebrow">COMO USAR</span>${lvl(m)}</div>
+     <ol>${G.steps.map(t=>`<li>${esc(t)}</li>`).join('')}</ol>
+     <div class="err"><b>Erro comum:</b> ${esc(G.err)}</div>
+     <span class="muted" style="font-size:13px">Sugestão: ${esc(G.sets)} · Nível ${LV[G.lv]}</span></div>
+    <div class="btn-row"><button class="btn${inT?' ghost':''}" type="button" data-act="treino-toggle" data-c="${code}">${inT?'✓ No treino':'+ Ao treino'}</button>
+     <button class="btn ghost" type="button" data-act="here" data-c="${code}">${here?'✓ Estou aqui':'Estou aqui'}</button></div>
+    <div class="card"><span class="eyebrow">ETIQUETA NFC / QR</span><span style="font-size:14px">Ao encostar o telemóvel à etiqueta desta máquina abre-se este ecrã e a app fica a saber que estás aqui.</span><code style="font-size:12px;color:var(--muted);word-break:break-all">…/#${m.slug}</code></div>
+    <a class="row" href="#reps-${m.slug}" style="text-decoration:none">${ic('dumb',22)}<span class="tx"><b>${(S.log[code]||[]).length?'O meu histórico · '+(S.log[code]||[]).length+' séries':'Regista as tuas Mr. BIG Reps'}</b><span>Repetições, peso e dia</span></span>${ic('next')}</a>
+    <button class="btn quiet" type="button" data-act="howto" aria-expanded="${S.howto}">${S.howto?'Esconder vídeo':'Ver vídeo'}</button>
+    ${S.howto?`<div class="card howto"><b>[Vídeo de 30 s gravado no ginásio]</b><ol>${HOW[m.cat].map(t=>`<li>${t}</li>`).join('')}</ol></div>`:''}
+    <section class="list"><h2 class="sec-h">Alternativas perto<small>mesmo músculo</small></h2>${alts.map(a=>mcard(a.x,{sm:true,meta:a.x.code+' · '+RNAME(a.x.room)+' · '+(a.d<99?Math.round(a.d)+' m daqui':FLOORNAME[a.x.f])})).join('')}</section>
+    <button class="btn quiet" type="button" data-act="report">Reportar avaria ou peça em falta</button>
+   </div></div></div>`;}
+const today=()=>new Date().toISOString().slice(0,10);
+function fmtDay(iso){const d=daysAgo(iso);const [y,m,dd]=iso.split('-');return (d===0?'Hoje · ':d===1?'Ontem · ':'')+dd+'/'+m+'/'+y;}
+function vReps(code){const m=BYCODE[code];if(!m)return vInicio();
+ const L=(S.log[code]||[]).slice().sort((a,b)=>b.d.localeCompare(a.d)||b.t-a.t);
+ const last=L[0];const F=S.form[code]||(S.form[code]={reps:last?last.reps:10,kg:last?last.kg:(m.cat==='cardio'?0:20),day:today()});
+ const days={};L.forEach(x=>(days[x.d]=days[x.d]||[]).push(x));
+ const best=L.reduce((b,x)=>(!b||x.kg>b.kg||(x.kg===b.kg&&x.reps>b.reps))?x:b,null);
+ const vol=(S.log[code]||[]).filter(x=>x.d===today()).reduce((a,x)=>a+x.reps*x.kg,0);
+ const first=!L.length;
+ return `<div class="scr">${top('Cheguei','',`<a class="icon-btn" href="#${m.slug}" aria-label="Ver ficha da máquina">${ic('next',20)}</a>`)}<div class="body" style="gap:14px">
+  <a class="mini" href="#${m.slug}"><span class="pic">${pic(m)}</span><span class="tx"><span style="display:flex;gap:8px;align-items:center"><span class="br" style="font-weight:700;font-size:12px;letter-spacing:.8px;text-transform:uppercase;color:var(--accent-text)">${esc(m.brand)}</span>${lvl(m)}</span><b>${esc(m.nameN)}</b><span>${m.code} · ${esc(RNAME(m.room))} · Fila ${m.row} · ${esc(m.muscle)}</span></span>${ic('next',20)}</a>
+  ${first?`<div class="card acc" style="gap:6px"><span class="eyebrow">PRIMEIRA VEZ NESTA MÁQUINA</span><h3>Cria o teu primeiro registo</h3><span class="muted">Regista as repetições e o peso de cada série. Na próxima vez vês aqui o teu histórico e o teu melhor.</span></div>`
+   :`<div class="pr"><div><span>ÚLTIMA</span><b>${last.reps}×${last.kg}</b><small class="muted" style="font-size:11px">${fmtDay(last.d).replace(/ · .*/,'')}</small></div><div><span>MELHOR</span><b>${best.reps}×${best.kg}</b><small class="muted" style="font-size:11px">kg</small></div><div><span>VOLUME HOJE</span><b>${vol}</b><small class="muted" style="font-size:11px">kg</small></div></div>`}
+  <div class="card logform"><h3>Regista as tuas <span>Mr. BIG Reps</span></h3>
+   <div class="num3">
+    <label class="numf" for="lgReps">REPETIÇÕES<span class="ctl"><button type="button" data-act="lg" data-f="reps" data-v="-1" aria-label="Menos uma repetição">−</button><input id="lgReps" type="number" inputmode="numeric" min="1" max="100" value="${F.reps}"><button type="button" data-act="lg" data-f="reps" data-v="1" aria-label="Mais uma repetição">+</button></span></label>
+    <label class="numf" for="lgKg">PESO (KG)<span class="ctl"><button type="button" data-act="lg" data-f="kg" data-v="-2.5" aria-label="Menos 2,5 kg">−</button><input id="lgKg" type="number" inputmode="decimal" min="0" step="0.5" value="${F.kg}"><button type="button" data-act="lg" data-f="kg" data-v="2.5" aria-label="Mais 2,5 kg">+</button></span></label>
+   </div>
+   <label class="numf" for="lgDay">DIA<input id="lgDay" type="date" value="${F.day}" max="${today()}"></label>
+   <button class="btn" type="button" data-act="lg-save" data-c="${code}">${first?'Guardar a primeira série':'Guardar série'}</button></div>
+  ${first?'':`<section style="display:flex;flex-direction:column;gap:12px"><h2 class="sec-h">Histórico<small>${L.length} séries</small></h2>
+   ${Object.keys(days).map(d=>`<div class="logday"><h4><span>${fmtDay(d).toUpperCase()}</span><span>${days[d].length} ${days[d].length===1?'SÉRIE':'SÉRIES'} · ${days[d].reduce((a,x)=>a+x.reps*x.kg,0)} KG</span></h4>${days[d].slice().reverse().map((x,i)=>`<div class="logrow"><span class="s">${i+1}</span><b>${x.reps}<small>reps</small> × ${x.kg}<small>kg</small></b><button type="button" data-act="lg-del" data-c="${code}" data-v="${x.t}" aria-label="Apagar esta série">${ic('x',16)}</button></div>`).join('')}</div>`).join('')}</section>`}
+  <p class="foot">Os registos ficam guardados neste telemóvel.</p></div>
+</div>`;}
+function nextMu(m){return S.big[0]&&forMuscle(S.big[0]).some(x=>x.code===m.code)?S.big[0]:m.muscle;}
+function nextHint(m){const left=S.treino.filter(c=>!S.done[c]&&c!==m.code);if(left.length)return 'Segue o teu treino: faltam '+left.length+' máquinas';return 'Escolhe outra máquina de '+nextMu(m)+', a partir de onde estás';}
+function vLer(){return `<div class="scr">${top('Ler QR / NFC')}<div class="body">
+   <div class="card acc"><span class="eyebrow">COMO FUNCIONA</span><h3>Encosta ou aponta</h3><span class="muted">Cada sala tem um QR na parede e cada máquina uma etiqueta NFC com o seu link. Na app real, o QR abre a câmara e o NFC funciona encostando o telemóvel. Aqui simulas a leitura.</span></div>
+   ${posLine()}
+   <section style="display:flex;flex-direction:column;gap:6px"><h2 class="sec-h">QR das salas</h2>${QRS.map(q=>`<button class="qr" type="button" data-act="qr" data-v="${q.id}" aria-pressed="${S.pos.id===q.id}">${ic('qr',20,2)}<span style="flex:1">${esc(q.label)}</span><span class="muted" style="font-size:12px">${FLOORNAME[q.f].split(' ·')[0]}</span></button>`).join('')}</section>
+   <section style="display:flex;flex-direction:column;gap:6px"><h2 class="sec-h">Etiqueta NFC de uma máquina</h2>
+    <label class="search" for="code">${ic('nfc',18)}<input id="code" placeholder="Código, ex. 4-C03" autocomplete="off"></label>
+    <div class="btn-row"><button class="btn" type="button" data-act="nfc-code">Ler código</button><button class="btn ghost" type="button" data-act="nfc-rand">Simular toque</button></div></section>
+  </div></div>`;}
+let ROUTE=null;
+function vMapa(){
+  const t=S.target?BYCODE[S.target]:null;
+  ROUTE=t&&S.nav?route(S.pos,{f:t.f,x:t.x,y:t.y,room:t.room}):null;
+  const st=ROUTE?steps(ROUTE):null;
+  const sel=S.sel?BYCODE[S.sel]:null;
+  let sheet='';
+  if(t&&S.nav&&ROUTE){
+    const next=S.fromTreino?orderTreino().find(c=>!S.done[c]&&c!==t.code):null;
+    sheet=`<div class="card mapsheet">${S.flow&&!S.fromTreino?stepper(3):''}<div class="eta"><span style="font:800 18px var(--display);text-transform:uppercase">${esc(t.nameN)}</span><b>≈ ${ROUTE.m} m · ${ROUTE.min} min</b></div>
+     <span class="muted" style="font-size:13px">${esc(t.brand)} · ${t.code} · ${esc(RNAME(t.room))} · Fila ${t.row} · ${FLOORNAME[t.f]} · <a href="#${t.slug}" style="color:var(--accent-text)">ficha</a></span>
+     <ol class="steps">${st.map(x=>`<li>${esc(x.t)}${x.f!==S.floor?` <button class="chip" type="button" data-act="floor" data-v="${x.f}" style="min-height:26px;font-size:11px">ver ${FLOORNAME[x.f].split(' ·')[0]}</button>`:''}</li>`).join('')}</ol>
+     <div class="btn-row">${next?`<button class="btn" type="button" data-act="treino-next">Feito · próxima</button>`:`<button class="btn" type="button" data-act="here" data-c="${t.code}">Cheguei</button>`}<button class="btn ghost" type="button" data-act="nav-stop">Parar</button></div></div>`;
+  }else if(false){
+    sheet=`<div class="card mapsheet"><div style="display:flex;gap:10px;align-items:center"><span class="dotc" style="background:var(${CAT[sel.cat].c})"></span><span style="flex:1;font:800 18px var(--display);text-transform:uppercase">${esc(sel.nameN)}</span><span class="badge">${sel.code}</span></div>
+     <span class="muted" style="font-size:13px">${esc(sel.brand)} · ${esc(sel.muscle)} · ${esc(RNAME(sel.room))} · Fila ${sel.row}</span>
+     <div class="btn-row"><button class="btn" type="button" data-act="go" data-c="${sel.code}">Levar-me lá</button><a class="btn ghost" href="#${sel.slug}">Ficha</a></div></div>`;
+  }else if(S.roomSel){const r=S.roomSel;const n=M.filter(m=>m.room===r).length;
+    sheet=`<div class="card mapsheet"><h3>${esc(RNAME(r))}</h3><span class="muted" style="font-size:13px">${esc((PLAN.functions||{})[r]||'')} · ${n} máquinas</span><div class="btn-row"><button class="btn" type="button" data-act="room-list" data-r="${r}">Ver máquinas</button><button class="btn ghost" type="button" data-act="room-clear">Fechar</button></div></div>`;
+  }else if(S.setPoint)sheet=`<div class="card mapsheet acc" style="gap:8px;border-color:var(--accent)"><b style="font-size:15px">${ic('pin',16)} Toca no mapa onde estás agora</b><span class="muted" style="font-size:12px">Numa sala, num corredor ou junto a uma máquina. Mais tarde isto passa a ser automático (QR, NFC, Wi-Fi ou Bluetooth).</span><button class="btn ghost sm" type="button" data-act="setpoint">Cancelar</button></div>`;
+  else sheet=`<div class="card mapsheet" style="gap:8px;flex-direction:row;align-items:center">${posLine()}<button class="cb" type="button" data-act="setpoint" style="margin-left:auto;flex:none">${ic('pin',15,2.4)} Set point</button></div>`;
+  return `<div class="scr">${top('Mapa','',`<button class="icon-btn${S.roomsOpen?' acc':''}" type="button" data-act="rooms-toggle" aria-label="Salas" aria-expanded="${!!S.roomsOpen}" style="width:40px;height:40px">${ic('rooms',20)}</button><div class="seg" role="group" aria-label="Piso">${[-1,0,1].map(f=>`<button type="button" data-act="floor" data-v="${f}" aria-pressed="${S.floor===f}">${f===-1?'−1':f}</button>`).join('')}</div>`)}
+   <div class="mapwrap" id="mapwrap">${mapSVG(S.floor,{route:ROUTE})}
+    <div class="maplegend">${['free','go','busy'].map(k=>`<span><i style="background:var(--st-${k})"></i>${STN[k]}</span>`).join('')}${S.zoom<2.2?'<span class="muted">· aproxima +</span>':''}</div>
+    <div class="mapctl"><button type="button" data-act="zin" aria-label="Aproximar">+</button><button type="button" data-act="zout" aria-label="Afastar">−</button><button type="button" data-act="zfit" aria-label="Ver tudo">⤢</button></div></div>
+   ${sheet}${popHTML()}${roomsHTML()}</div>`;}
+function roomsHTML(){if(!S.roomsOpen)return '';
+ return `<div class="mappop" role="dialog" aria-label="Salas" style="max-height:62%;overflow:auto;gap:8px"><button class="x" type="button" data-act="rooms-toggle" aria-label="Fechar">${ic('x',20)}</button>
+  <h3 style="font-size:20px">Salas</h3><span class="mt" style="margin-top:-6px">Toca numa sala para a ver no mapa.</span>
+  <div class="list">${ROOMORDER.map(r=>{const n=M.filter(m=>m.room===r).length;return `<button class="row" type="button" data-act="room-go" data-r="${r}" style="cursor:pointer;text-align:left;width:100%;border-radius:12px"><span class="tx"><b>${esc(RNAME(r))}</b><span>${esc((PLAN.functions||{})[r]||'')} · ${FLOORNAME[ROOMS[r].floor].split(' ·')[0]}</span></span><span class="badge">${n}</span></button>`;}).join('')}</div></div>`;}
+function popHTML(){const m=S.pop?BYCODE[S.pop]:null;if(!m)return '';const d=distFromPos(m);const here=S.pos.code===m.code;
+ return `<div class="mappop" role="dialog" aria-label="${esc(m.nameN)}"><button class="x" type="button" data-act="pop-close" aria-label="Fechar">${ic('x',20)}</button>
+  <div class="row1"><span class="pic">${pic(m)}</span><span class="tx"><span style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="br">${esc(m.brand)}</span>${lvl(m)}</span><h3>${esc(m.nameN)}</h3>
+   <span class="mt">${MEMO[m.muscle]||''} ${esc(m.muscle)}</span><span class="mt">${m.code} · ${esc(RNAME(m.room))} · Fila ${m.row} · ${here?'estás aqui':'≈ '+d+' m'}</span>${stDot(m)}</span></div>
+  <div class="btn-row"><button class="btn" type="button" data-act="go" data-c="${m.code}">GO</button><a class="btn ghost" href="#${m.slug}">Ver mais detalhes</a></div></div>`;}
+function fmt(d){try{const [y,m,dd]=d.split('-');return `${dd}/${m}/${y}`;}catch(e){return d;}}
+const PREVB=[-2,2,76,108];
+function vBreve(){
+  const fut=S.planView==='futuro';const news=[];
+  if(S.pub&&S.showSoon)news.push({id:'n1',tag:'NOVA ZONA',when:S.dateLive?fmt(S.dateLive):'[data]',title:`${S.m2name}: mezanino sobre a Sala 6`,desc:'Novo piso por cima das pernas, com mais leg press, hack squats e hip thrusts. Acesso por escadas novas dentro da Sala 6.'});
+  news.push({id:'n2',tag:'MÁQUINAS NOVAS',when:'Este mês',title:'3 máquinas de costas a chegar',desc:'Vão para a Sala 3, fila G. Recebe um aviso quando estiverem montadas.'});
+  news.push({id:'n3',tag:'OBRAS',when:'[datas]',title:'Mezanino 3 ganha mais cabos',desc:'Durante as obras, parte das polias passa para a Sala 1.'});
+  return `<div class="scr">${top('Brevemente')}<div class="body" style="gap:16px">
+   ${S.pub&&S.showSoon?`<div class="seg" role="group" aria-label="Planta">${[['hoje','PLANTA DE HOJE'],['futuro','PLANTA FUTURA']].map(v=>`<button type="button" data-act="planview" data-v="${v[0]}" aria-pressed="${S.planView===v[0]}">${v[1]}</button>`).join('')}</div>
+   <div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><span class="eyebrow">${fut?'PREVIEW · PISO 1':'EM VIGOR · PISO 1'}</span><span class="muted" style="font-size:13px">${fut?'Entra em vigor: '+(S.dateLive?fmt(S.dateLive):'[data]'):'Igual ao Mapa'}</span></div>
+    <div class="planbox">${mapSVG(1,{static:true,vb:PREVB,future:fut})}</div>
+    ${fut?`<div class="leg"><span><i style="border:3px dashed var(--accent-text)"></i>Novo: ${esc(S.m2name)} (Piso 1, sobre a Sala 6)</span></div>`:''}</div>`:''}
+   <h2 class="sec-h">Anúncios</h2>
+   ${news.map(n=>{const on=!!S.follows[n.id];return `<div class="card news"><div style="display:flex;justify-content:space-between;gap:8px"><span class="eyebrow">${n.tag}</span><span class="muted" style="font-size:12px">${esc(n.when)}</span></div><h3>${esc(n.title)}</h3><span class="muted">${n.desc}</span>
+     <div><button class="btn sm${on?' ghost':''}" type="button" data-act="follow" data-id="${n.id}" aria-pressed="${on}">${on?'✓ Vais ser avisado':'Avisa-me'}</button></div></div>`;}).join('')}
+   <p class="foot">Anúncios e datas de exemplo</p></div></div>`;}
+function vGestor(){
+  const V=[{id:'v1',name:'Planta atual (v1.9)',st:'Em vigor'},{id:'v2',name:`${S.m2name} sobre a Sala 6`,st:S.pub?'Anunciada · visível no Brevemente':'Rascunho',live:S.pub},{id:'v3',name:'Ideia: zona de strongman',st:'Rascunho vazio'}];
+  let main='';
+  if(S.admVer==='v1')main=`<div class="card"><span class="eyebrow">EM VIGOR</span><div class="seg" role="group" aria-label="Piso">${[-1,0,1].map(f=>`<button type="button" data-act="adm-floor" data-v="${f}" aria-pressed="${S.admFloor===f}">PISO ${f===-1?'−1':f}</button>`).join('')}</div><div class="planbox">${mapSVG(S.admFloor,{static:true,vb:S.admFloor===0?[-3,2,78,126]:PREVB})}</div><span class="muted">É a planta que os sócios veem no Mapa: 3 pisos, ${M.length} máquinas. Para mudar, cria uma versão nova.</span></div>`;
+  else if(S.admVer==='v3')main=`<div class="card"><span class="eyebrow">RASCUNHO</span><h3>Ainda sem alterações</h3><span class="muted">No PC, arrasta salas e máquinas para a planta. Aqui no telemóvel vês o preview e publicas.</span></div>`;
+  else main=`<div class="seg" role="group" aria-label="Comparar">${[['hoje','HOJE'],['futuro','PREVIEW FUTURO']].map(v=>`<button type="button" data-act="admview" data-v="${v[0]}" aria-pressed="${S.admView===v[0]}">${v[1]}</button>`).join('')}</div>
+   <div class="card"><div class="planbox">${mapSVG(1,{static:true,vb:PREVB,future:S.admView==='futuro'})}</div>
+    <div class="leg"><span><i style="border:3px dashed var(--accent-text)"></i>Zona nova · Piso 1</span></div></div>
+   <div class="card"><span class="eyebrow">ZONA NOVA · M6 · PISO 1</span>
+    <label class="field" for="m2name">Nome da zona<input type="text" id="m2name" value="${esc(S.m2name)}"></label>
+    <div class="btn-row"><label class="field" for="dAnn">Anunciar a partir de<input type="date" id="dAnn" value="${esc(S.dateAnn)}"></label><label class="field" for="dLive">Entra em vigor<input type="date" id="dLive" value="${esc(S.dateLive)}"></label></div>
+    <label class="check" for="showSoon"><input class="chk" type="checkbox" id="showSoon" data-act="showsoon" ${S.showSoon?'checked':''}>Mostrar planta futura no "Brevemente"</label>
+    <button class="btn${S.pub?' ghost':''}" type="button" data-act="publish">${S.pub?'Despublicar anúncio':'Publicar anúncio'}</button>
+    <span class="muted" style="font-size:13px">${S.pub?'Os sócios já veem esta versão no Brevemente. O Mapa só muda na data de entrada em vigor.':'Ao publicar, a preview aparece no Brevemente. O Mapa continua igual até à data de entrada em vigor.'}</span></div>`;
+  return `<div class="scr">${top('Planeador','SUPER USER',`<a class="icon-btn" href="#inicio" aria-label="Sair do modo gestor">${ic('x',18)}</a>`)}<div class="body" style="gap:14px">
+   <h2 class="sec-h">Versões da planta</h2>
+   <div class="vers">${V.map(v=>`<button type="button" data-act="adm-ver" data-v="${v.id}" aria-pressed="${S.admVer===v.id}"><b>${esc(v.name)}</b><span class="${v.live?'live':''}">${v.st}</span></button>`).join('')}</div>
+   ${main}</div></div>`;}
+function vEntrada(){return `<div class="scr"><div class="body" style="justify-content:center;align-items:center;text-align:center;gap:20px">
+  <img class="emb" src="${EMB}" alt="Mr Big Evolution" style="width:84px;height:84px;border-width:3px">
+  <div style="display:flex;flex-direction:column;gap:8px;align-items:center"><span class="eyebrow">BEM-VINDO À MR BIG EVOLUTION</span><h1 class="title-xl">Encosta à cancela</h1>
+  <p class="muted" style="margin:0;max-width:30ch">Encosta o telemóvel à etiqueta NFC da cancela de entrada. A app fica a saber que estás na receção.</p></div>
+  <button class="nfcring" type="button" data-act="gate" aria-label="Encostar à cancela de entrada">${ic('nfc',72,2)}</button>
+  <span class="foot">Protótipo: toca no ícone. No iPhone real basta encostar.</span>
+  <button class="btn quiet" type="button" data-act="skip-onb" style="width:100%;margin-top:12px">Agora não</button></div></div>`;}
+/* Escolha: one reusable tile grid (4 columns, equal tiles, never scrolls sideways).
+   Used for the Big Muscle question, Início, the exercise type inside a muscle and the Máquinas filter. */
+function tiles(items,o){o=o||{};return `<div class="tiles${o.size?' '+o.size:''}" role="group" aria-label="${esc(o.label||'')}">${items.map(x=>`<button class="tile${x.icon?' hasem':''}" type="button" data-act="${o.act}" data-v="${esc(x.v)}" aria-pressed="${!!x.on}">${x.badge?`<i>${esc(x.badge)}</i>`:''}${x.icon?`<span class="em" aria-hidden="true">${x.icon}</span>`:''}<b${String(x.label).split(' ').some(w=>w.length>8)?' style="font-size:11.5px"':''}>${esc(x.label)}</b>${x.sub?`<span>${esc(x.sub)}</span>`:''}</button>`).join('')}</div>`;}
+const BIG8=['Peito','Costas','Ombros','Bíceps','Tríceps','Pernas','Glúteos','Gémeos'];
+function daysAgo(iso){if(!iso)return null;const d=Math.round((Date.parse(new Date().toISOString().slice(0,10))-Date.parse(iso))/864e5);return d;}
+function agoTxt(d){return d===0?'hoje':d===1?'ontem':'há '+d+' dias';}
+function suggested(){const tr=BIG8.filter(m=>S.hist[m]);if(tr.length<2)return null;const never=BIG8.find(m=>!S.hist[m]);if(never)return never;return BIG8.slice().sort((a,b)=>(S.hist[a]<S.hist[b]?-1:1))[0];}
+function muscleTiles(size){const sug=suggested();const inFlow=current()==='musculo'||current()==='bigmuscle';return tiles(BIG8.map(mu=>{const d=daysAgo(S.hist[mu]);return {v:mu,label:mu,icon:MEMO[mu],sub:d!==null?agoTxt(d):forMuscle(mu).length+' máq.',badge:S.big[0]===mu?'':(S.lastMu===mu?'ÚLTIMO':mu===sug?'SUGERIDO':''),on:inFlow&&S.big[0]===mu};}),{act:'big-pick',size,label:'Músculo'});}
+const FLOW=['Músculo','Tipo','Máquina'];
+function stepper(i){return `<div class="steps4 steps3" aria-label="Flex Start, passo ${Math.min(i+1,3)} de 3">${FLOW.map((t,k)=>`<span class="${k<i?'done':k===i?'cur':''}">${k+1} ${t}</span>`).join('')}</div>`;}
+function bigList(){return M.filter(m=>S.big.some(mu=>forMuscle(mu).includes(m)));}
+function vBig(){return vFlow();}
+function bigTyped(){const mu=S.big[0];const all=forMuscle(mu).map(m=>({m,mu,t:exType(m,mu)}));
+ // at most 7 types + Todos = 8 tiles (4 x 2): the smallest groups fold into "Outros"
+ const c={};all.forEach(x=>c[x.t]=(c[x.t]||0)+1);const keep=Object.keys(c).filter(t=>!/Multi|Outros/.test(t)).sort((a,b)=>c[b]-c[a]);
+ const multi=Object.keys(c).filter(t=>/Multi/.test(t));const room=7-multi.length;const main=keep.slice(0,keep.length>room?room-1:room);
+ all.forEach(x=>{x.label=(main.includes(x.t)||/Multi/.test(x.t))?x.t:'Outros';});return all;}
+function vMusculo(){return vFlow();}
+/* Flex Start: one screen, three steps. 1 Músculo, 2 Tipo, 3 Máquina (filtered list). */
+function vFlow(){
+ const mu=S.big[0];const sug=suggested();const fromRec=S.pos.room==='0';
+ let typesHTML='',listHTML='',n=0,step=0;
+ if(mu){step=1;const all=bigTyped();const counts={};all.forEach(x=>counts[x.label]=(counts[x.label]||0)+1);
+  const types=Object.keys(counts).sort((a,b)=>(/Multi|Outros/.test(a)-/Multi|Outros/.test(b))||counts[b]-counts[a]);
+  if(S.type&&S.type!=='Todos'&&!counts[S.type])S.type='';if(S.type)step=2;
+  const list=all.filter(x=>S.type==='Todos'||x.label===S.type).map(x=>Object.assign(x,{d:distFromPos(x.m)}));n=list.length;
+  const groups=types.filter(t=>S.type==='Todos'||t===S.type).map(t=>[t,list.filter(x=>x.label===t).sort((a,b)=>a.d-b.d)]).filter(g=>g[1].length);
+  const tt=[{v:'Todos',label:'Todos',icon:TEMO.Todos,sub:all.length+' máq.',on:S.type==='Todos'}].concat(types.map(t=>({v:t,label:t,icon:temo(mu,t),sub:counts[t]+' máq.',on:S.type===t,badge:S.lastType[mu]===t&&S.type!==t?'ÚLTIMO':''})));
+  typesHTML=tiles(tt,{act:'type',label:'Tipo de exercício'});
+  if(S.type)listHTML=`<h2 class="fsec" id="sec3"><em>3</em>Máquina<small>${n} · a mais perto primeiro</small></h2>${groups.map(([t,g])=>`${S.type==='Todos'?`<h3 class="grp-h">${temo(mu,t)} ${esc(t)} · ${g.length}</h3>`:''}${g.map(x=>mcard(x.m,{flow:true,meta:RNAME(x.m.room)+' · '+x.m.code+' · ≈ '+x.d+' m'})).join('')}`).join('')}<p class="foot">Dados de exemplo</p>`;}
+ return `<div class="scr"><div class="body" style="gap:10px">
+  ${stepper(step)}
+  <div style="display:flex;flex-direction:column;gap:4px"><span class="eyebrow">FLEX START · PRÓXIMA MR.BIG MACHINE</span><h1 class="title-xl" style="font-size:34px">Qual o Big Muscle?</h1>
+   <span class="crumb">${ic('pin',14)}<span>${fromRec?'Desde a <b>receção</b>':'Desde <b>'+esc(S.pos.label)+'</b>'}</span>${!mu&&sug?`<span>· Sugestão: <b>${sug}</b></span>`:''}</span></div>
+  <h2 class="fsec"><em>1</em>Que músculo?<small>${mu?MEMO[mu]+' '+esc(mu)+' · toca noutro para trocar':'toca num músculo'}</small></h2>
+  ${muscleTiles('')}
+  <h2 class="fsec" id="sec2"><em>2</em>Que tipo de exercício?<small>${mu?(S.type?(S.type!=='Todos'?temo(mu,S.type)+' '+esc(S.type):'todos os tipos'):'toca num tipo'):'depois do músculo'}</small></h2>
+  ${mu?typesHTML:`<div class="tiles" aria-hidden="true">${Array.from({length:8},()=>'<div class="tile ghost"><b>&nbsp;</b><span>&nbsp;</span></div>').join('')}</div><span class="muted" style="font-size:13px;text-align:center;margin-top:-4px">Escolhe primeiro o músculo, aqui aparecem os tipos dele.</span>`}
+  ${mu&&!S.type?'<span class="muted" style="font-size:13px;text-align:center">Escolhe um tipo e a lista de máquinas aparece logo por baixo.</span>':''}
+  ${listHTML}
+  ${!mu&&!S.onb?`<button class="btn quiet" type="button" data-act="skip-onb">Saltar e ir para o início</button>`:''}</div></div>`;}
+const TEMPLATES=[['Peito + tríceps',['Peito','Tríceps'],7],['Costas + bíceps',['Costas','Bíceps'],7],['Pernas',['Pernas','Gémeos'],7],['Glúteos',['Glúteos'],6],['Ombros + core',['Ombros','Core'],6],['Cardio 30 min',['Cardio'],3]];
+function buildTemplate(i){const [,mus,n]=TEMPLATES[i];const pick=[];const usedNames=new Set();
+  mus.forEach((mu,k)=>{const want=Math.ceil(n/mus.length);M.filter(m=>m.muscle===mu&&!usedNames.has(m.name)).sort((a,b)=>(a.f-b.f)||(a.x-b.x)).forEach(m=>{if(pick.length<n&&pick.filter(p=>BYCODE[p].muscle===mu).length<want){pick.push(m.code);usedNames.add(m.name);}});});
+  return pick;}
+function distBetween(a,b){const r=route(a,b);return r?r.m:999;}
+function orderTreino(){let cur=S.pos;const left=S.treino.slice(),out=[];while(left.length){let bi=0,bd=Infinity;left.forEach((c,i)=>{const m=BYCODE[c];const d=distBetween(cur,{f:m.f,x:m.x,y:m.y,room:m.room});if(d<bd){bd=d;bi=i;}});const c=left.splice(bi,1)[0];out.push(c);const m=BYCODE[c];cur={f:m.f,x:m.x,y:m.y,room:m.room};}return out;}
+function vTreino(){
+  const seg=`<div style="padding-top:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))"><div class="seg" role="group" aria-label="Vista">${[['plan','O MEU TREINO'],['hist','HISTÓRICO']].map(v=>`<button type="button" data-act="tview" data-v="${v[0]}" aria-pressed="${(S.tview||'plan')===v[0]}">${v[1]}</button>`).join('')}</div></div>`;
+  if(S.tview==='hist')return vHist(seg);
+  return vTreinoPlan().replace('<div class="body"',seg+'<div class="body"');}
+function vHist(seg){
+  const codes=Object.keys(S.log).filter(c=>BYCODE[c]&&(S.log[c]||[]).length);
+  const musOf=c=>BYCODE[c].muscle;
+  const cnt={};codes.forEach(c=>{const mu=musOf(c);cnt[mu]=(cnt[mu]||0)+1;});
+  const muT=tiles(BIG8.map(mu=>({v:mu,label:mu,icon:MEMO[mu],sub:(cnt[mu]||0)+' máq.',on:S.hMu===mu})),{act:'h-mu',size:'sm',label:'Músculo'});
+  let list=codes.filter(c=>!S.hMu||musOf(c)===S.hMu);
+  let typeT='';
+  if(S.hMu){const tc={};list.forEach(c=>{const t=exType(BYCODE[c],S.hMu);tc[t]=(tc[t]||0)+1;});const ts=Object.keys(tc);
+    if(S.hType&&!tc[S.hType])S.hType='';
+    typeT=ts.length?`<h2 class="fsec"><em>2</em>Tipo<small>${S.hType?'toca outra vez para limpar':'opcional'}</small></h2>`+tiles(ts.map(t=>({v:t,label:t,icon:temo(S.hMu,t),sub:tc[t]+' máq.',on:S.hType===t})),{act:'h-type',size:'sm',label:'Tipo'}):'';
+    if(S.hType)list=list.filter(c=>exType(BYCODE[c],S.hMu)===S.hType);}
+  const rows=list.map(c=>{const L=S.log[c].slice().sort((a,b)=>b.d.localeCompare(a.d)||b.t-a.t);const best=L.reduce((b,x)=>(!b||x.kg>b.kg||(x.kg===b.kg&&x.reps>b.reps))?x:b,null);return {c,m:BYCODE[c],L,last:L[0],best,vol:L.reduce((a,x)=>a+x.reps*x.kg,0)};}).sort((a,b)=>b.last.d.localeCompare(a.last.d)||b.last.t-a.last.t);
+  const tot=rows.reduce((a,r)=>a+r.L.length,0),vol=rows.reduce((a,r)=>a+r.vol,0);
+  const fmtKg=v=>String(v).replace('.',',');
+  const body=!codes.length?`<div class="card" style="text-align:center;align-items:center"><h3>Ainda sem histórico</h3><span class="muted">Quando chegares a uma máquina, regista as tuas Mr. BIG Reps. Aparecem aqui, por músculo e tipo.</span></div>`
+   :`<h2 class="fsec"><em>1</em>Músculo<small>${S.hMu?'toca outra vez para ver todos':'todos'}</small></h2>${muT}${typeT}
+   <div class="pr"><div><span>MÁQUINAS</span><b>${rows.length}</b></div><div><span>SÉRIES</span><b>${tot}</b></div><div><span>VOLUME</span><b>${vol>=1000?fmtKg((vol/1000).toFixed(1))+'t':vol+'kg'}</b></div></div>
+   <div class="list">${rows.length?rows.map(r=>`<a class="mini" href="#reps-${r.m.slug}" style="border-radius:16px"><span class="pic" style="border-radius:10px">${pic(r.m)}</span><span class="tx"><span style="display:flex;gap:8px;align-items:center;justify-content:space-between"><span class="br" style="font-weight:700;font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--accent-text)">${esc(r.m.brand)}</span>${lvl(r.m)}</span><b style="font:700 15px var(--body);text-transform:none">${esc(r.m.nameN)}</b><span>${r.L.length} séries · última ${r.last.reps}×${fmtKg(r.last.kg)} kg · ${fmtDay(r.last.d).replace(/ · .*/,'').toLowerCase()}</span><span>Melhor ${r.best.reps}×${fmtKg(r.best.kg)} kg · ${esc(RNAME(r.m.room))} · ${r.m.code}</span></span></a>`).join(''):'<p class="foot">Sem registos com estes filtros.</p>'}</div>`;
+  return `<div class="scr">${top('Treino')}${seg}<div class="body" style="gap:10px">${body}</div></div>`;}
+function vTreinoPlan(){
+  if(!S.treino.length)return `<div class="scr">${top('Treino')}<div class="body"><div class="card acc"><span class="eyebrow">TREINOS PRONTOS</span><h3>Escolhe e segue a rota</h3><span class="muted">A app escolhe máquinas da legenda de cada sala e ordena-as a partir de onde estás.</span></div>
+   <div class="list">${TEMPLATES.map((t,i)=>`<button class="row" type="button" data-act="load" data-v="${i}" style="cursor:pointer;text-align:left;width:100%">${ic('dumb',22)}<span class="tx"><b>${t[0]}</b><span>${t[2]} máquinas · ${t[1].join(', ')}</span></span>${ic('next')}</button>`).join('')}</div>
+   <p class="foot">Também podes juntar máquinas a partir da ficha de cada uma.</p></div></div>`;
+  const ord=orderTreino();let cur=S.pos,total=0;
+  const items=ord.map((c,i)=>{const m=BYCODE[c];const d=distBetween(cur,{f:m.f,x:m.x,y:m.y,room:m.room});total+=d;cur={f:m.f,x:m.x,y:m.y,room:m.room};const sets=S.sets[c]||0;
+    return `<div class="titem${S.done[c]?' done':''}"><span class="num">${i+1}</span><span class="pic">${pic(m)}</span><a class="tx" href="#${m.slug}" style="color:var(--fg);text-decoration:none;flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><b style="font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(m.nameN)}</b><span style="font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:center">${lvl(m)}${m.code} · +${d} m</span></a>
+     <div class="sets" aria-label="Séries"><button type="button" data-act="set-" data-c="${c}" aria-label="Menos uma série">−</button><b>${sets}/4</b><button type="button" data-act="set+" data-c="${c}" aria-label="Mais uma série">+</button></div></div>`;}).join('');
+  const left=ord.filter(c=>!S.done[c]).length;
+  return `<div class="scr">${top('Treino',S.treino.length+' MÁQ.')}<div class="body" style="gap:12px">
+   <div class="card acc"><span class="eyebrow">ROTA OTIMIZADA</span><h3>≈ ${total} m · ${left} por fazer</h3>${posLine()}
+    <div class="btn-row"><button class="btn" type="button" data-act="treino-start" ${left?'':'disabled'}>Começar rota</button><button class="btn ghost" type="button" data-act="treino-reset">Recomeçar</button></div></div>
+   <div class="list">${items}</div></div></div>`;}
+
+/* ================= i18n: PT (source) → EN ================= */
+const L=(pt,en)=>S.lang==='en'?en:pt;
+const NAMES_EN={"Abdominal":"Ab crunch","Abdutora":"Hip abductor","Adutora":"Hip adductor","Antebraço":"Forearm","Banco Scott livre":"Free preacher bench","Banco abdominal":"Ab bench","Banco ajustável":"Adjustable bench","Banco de hip thrust":"Hip thrust bench","Banco de supino declinado com barra":"Decline barbell bench","Banco de supino inclinado com barra":"Incline barbell bench","Banco de supino olímpico":"Olympic bench press","Banco de supino plano com barra":"Flat barbell bench","Banco lombar":"Back extension bench","Banco plano / inclinado":"Flat / incline bench","Barra de elevações":"Pull-up bar","Base de powerlifting":"Powerlifting platform","Bicicleta de spinning":"Spin bike","Bicicleta reclinada":"Recumbent bike","Bicicleta vertical":"Upright bike","Chest press convergente":"Converging chest press","Coice na polia":"Cable kickback","Crossover de cabos duplo":"Dual cable crossover","Curl Bayesian na polia":"Bayesian cable curl","Curl Scott máquina":"Preacher curl machine","Curl de bíceps na polia baixa":"Low cable biceps curl","Curl de bíceps":"Biceps curl","Curl martelo na polia":"Cable hammer curl","Curl sentado":"Seated curl","Deltóide posterior em cabos":"Cable rear delt fly","Deltóide posterior":"Rear delt machine","Dips assistidos":"Assisted dips","Elevação frontal na polia":"Cable front raise","Elevação frontal":"Front raise","Elevação lateral na polia":"Cable lateral raise","Elevação lateral sentado":"Seated lateral raise","Elevação lateral":"Lateral raise","Elíptica":"Elliptical","Escada infinita":"Stair climber","Estação multi-polia 4 lugares":"4-station cable tower","Estrutura de polias ajustável":"Adjustable cable rig","Extensão de pernas":"Leg extension","Extensão de tríceps":"Triceps extension","Face pull na polia":"Cable face pull","Glúteo em pé":"Standing glute","Gémeos em pé":"Standing calf raise","Gémeos sentado":"Seated calf raise","Hack squat livre":"Free hack squat","Hip thrust máquina":"Hip thrust machine","Leg curl deitado":"Lying leg curl","Leg curl sentado":"Seated leg curl","Lombar":"Back extension","Lunge machine":"Lunge machine","Multipower":"Smith machine","Paralelas de dips":"Dip bars","Passadeira":"Treadmill","Peck fly de cabos":"Cable pec fly","Press de ombro com barra":"Barbell shoulder press","Press de ombro na polia":"Cable shoulder press","Press de ombro":"Shoulder press","Press militar sentado":"Seated military press","Pullover na polia":"Cable pullover","Puxada alta na polia":"High cable pulldown","Puxada frontal":"Lat pulldown","Puxada unilateral na polia":"Single-arm cable pulldown","Rack de agachamento":"Squat rack","Remada T":"T-bar row","Remada alta na polia":"Cable upright row","Remada convergente":"Converging row","Remada sentada":"Seated row","Remada unilateral na polia":"Single-arm cable row","Remo baixo na polia":"Low cable row","Remo indoor":"Indoor rower","Rotação de ombro":"Shoulder rotation","Tríceps na polia alta":"High cable triceps pushdown","Tríceps na polia":"Cable triceps pushdown","Tríceps overhead na polia":"Overhead cable triceps","Halteres · conjunto":"Dumbbell set"};
+const FUNC_EN={"1":"Cardio and selectorized machines","2":"Bench press bars and benches (flat, incline, decline), 2 hacks at the end, 1 shoulder press","3":"Plate-loaded machines, 4 paired rows with aisles","4":"Free weights under the mezzanine, 8 columns × 6 rows: dumbbells, benches, Smith machines, powerlifting platforms","8":"Room 7: monolifts","6":"Legs: calves, curls, extensions","5":"Glutes","M4":"More glutes (mezzanine above room 4)","M3":"Cables and pulleys: 5 rows (one at each corner and 3 in the middle) with 2 aisles","7":"Posing room","C6":"Basement: plate-loaded machines (overflow from room 3)"};
+const GUIDE_EN=[
+["Walk or run on a motorised belt. Good for warming up or steady cardio.",["Step onto the side rails and start the machine at a low speed.","Clip the safety key to your clothing.","Build up the speed gradually and stay upright without holding the handles.","To slow down, lower the speed before stopping."],"Holding the handles while running: it changes your posture and cuts the real effort.","5 min warm-up or 20–30 min steady"],
+["Low-impact cardio that is easy on the joints, with adjustable resistance.",["Set the saddle to hip height while standing next to the bike.","With the pedal at the bottom, the knee stays slightly bent.","Start with light resistance and a steady cadence.","Raise the resistance in intervals."],"Saddle too low: the knees come up too high and tire early.","10–30 min"],
+["Full-body, no-impact cardio, arms and legs together.",["Step on with your feet flat on the pedals.","Hold the moving handles.","Push and pull with your arms while you pedal.","Keep your torso upright and look ahead."],"Leaning forward and resting your weight on the handles.","15–30 min"],
+["Full-body cardio: 60% legs, 20% torso, 20% arms.",["Strap your feet in across the widest part of the foot.","Drive with the legs first, then lean back, then pull the handle to your chest.","Return in reverse order: arms, torso, legs.","Keep a pace of 24–28 strokes per minute."],"Pulling with the arms before driving with the legs.","10–20 min or 2000 m"],
+["Continuous stair climbing. Very demanding on glutes and cardio.",["Step on while the machine is stopped and hold the handles.","Start at a low level.","Step with your whole foot, not just the toes.","Keep your torso upright and let go of the handles once you feel stable."],"Hanging on the handles and taking the weight off your legs.","10–20 min"],
+["Free weights for almost every muscle. They demand control and stability.",["Pick the pair of dumbbells and carry them close to your body to the bench.","Sit or lie down with the dumbbells resting on your thighs.","Move without swinging, through the full range.","Rack the dumbbells by weight when you finish."],"Dropping the dumbbells on the floor at the end of the set.","3 sets of 8–12"],
+["Core chest exercise with an Olympic bar. Always use the safeties or a spotter.",["Lie down with your eyes under the bar and your feet planted.","Grip the bar a little wider than your shoulders.","Lower under control to your chest, elbows at about 45°.","Press until your arms are straight without lifting your back off the bench."],"Bouncing the bar off your chest.","4 sets of 6–10"],
+["Decline bench for bodyweight ab work.",["Hook your feet under the pads.","Cross your arms over your chest.","Curl up one vertebra at a time.","Lower slowly without slamming your back down."],"Pulling your head with your hands.","3 sets of 12–20"],
+["Lower-back extension with bodyweight or a machine.",["Set the pad at hip height.","Cross your arms or bring them to your chest.","Lower with a straight back.","Rise until your body is in line, not past it."],"Over-arching at the top.","3 sets of 12–15"],
+["Biceps curl with the arm supported, no cheating.",["Set the seat so your armpit sits on top of the pad.","Grip the bar or dumbbell palms up.","Curl to your shoulder without lifting your elbows.","Lower until almost straight."],"Snapping straight at the bottom: it strains the elbow.","3 sets of 10–12"],
+["Bench for dumbbell or barbell work, flat or incline.",["Pick the angle: flat for mid chest, 30° for upper chest.","Sit with your feet on the floor and your back supported.","Do the chosen exercise under control.","Return the bench to flat when you finish."],"Too much incline: the exercise shifts to the shoulders.","3 sets of 8–12"],
+["Bar guided on rails. Gives stability for squats, bench press or overhead press.",["Set the safety stops just below the lowest point of the movement.","Get under the bar and rotate it to unhook.","Move along the line of the rails.","Rotate the bar to hook it back at the end."],"Not setting the safety stops.","4 sets of 8–10"],
+["Strength station for squat, bench and deadlift with heavy loads.",["Set the bar at shoulder height and the safeties just below the bottom of your squat.","Place the bar on your traps and step out in two steps.","Lower with your chest up and knees tracking your toes.","Drive through the floor and rack the bar on the hooks."],"Training heavy without safeties or a spotter.","5 sets of 3–5"],
+["Bodyweight pull-ups. Back and biceps.",["Grip the bar a little wider than your shoulders.","Start hanging with straight arms.","Pull until your chin clears the bar, chest towards the bar.","Lower under control until straight."],"Swinging your body for momentum.","4 sets to technical failure"],
+["Bodyweight dips. Triceps and chest.",["Start with straight arms and shoulders down.","Lower until your elbows reach 90°.","Upright torso for triceps, leaning forward for chest.","Press until straight."],"Going too deep and straining the shoulders.","3 sets of 8–12"],
+["Guided chest flyes. Isolates the chest without the triceps.",["Set the seat so the handles are at chest height.","Back flat against the pad, elbows slightly bent.","Bring the handles together in front of your chest, slowly.","Return until you feel the chest stretch, not past shoulder line."],"Opening too wide and pulling the shoulder back.","3 sets of 12–15"],
+["Machine chest press. Converging path similar to the bench press.",["Set the seat so the handles are at mid-chest.","Back and head supported, shoulder blades squeezed.","Press until your arms are almost straight.","Return slowly until you feel the chest stretch."],"Lifting your back off the pad to push more weight.","3 sets of 8–12"],
+["Vertical pull for the back. A guided alternative to pull-ups.",["Set the pad so it holds your thighs firmly.","Grip the bar wider than your shoulders.","Pull the bar to your upper chest, elbows down.","Return under control until your arms are straight."],"Pulling behind the neck or swinging your torso.","3 sets of 10–12"],
+["T-bar row with heavy free weight. Needs a stable back.",["Stand on the platform and hinge at the hips with a flat back.","Grip the handles with straight arms.","Pull to your stomach, squeezing your shoulder blades.","Lower without rounding your lower back."],"Rounding the lower back at the bottom.","4 sets of 8–10"],
+["Row for back thickness.",["Set the chest pad or seat so you reach the handles with straight arms.","Chest up, shoulders down.","Drive your elbows back and squeeze your shoulder blades.","Return slowly until straight."],"Pulling with the arms and forgetting the shoulder blades.","3 sets of 10–12"],
+["Pullover for the lats, with the arm almost straight.",["Set the seat so your shoulder lines up with the pivot.","Hold the bar or rope overhead.","Pull in an arc down to your thighs with arms almost straight.","Return slowly without losing tension."],"Bending the elbows too much and turning it into a triceps move.","3 sets of 12"],
+["Shrugs for the traps.",["Hold the handles with your arms at your sides.","Raise your shoulders towards your ears.","Hold for 1 second at the top.","Lower slowly."],"Rolling the shoulders: just up and down.","3 sets of 12–15"],
+["Barbell military press. Shoulders and triceps, needs a solid core.",["Take the bar off the rack at chest height.","Feet hip-width apart, glutes and abs tight.","Press the bar overhead, close to your face.","Lower to your chin under control."],"Arching the lower back to push.","4 sets of 6–8"],
+["Guided shoulder press, no need to balance the load.",["Set the seat so the handles are at shoulder height.","Back flat against the pad.","Press until your arms are straight.","Lower to chin height without letting the stack touch down."],"Seat too low: it strains the shoulders at the bottom.","3 sets of 8–12"],
+["Cable raise: constant tension through the whole movement.",["Clip the handle to the low pulley and stand side-on to the machine.","Hold it with the far hand.","Raise your arm to shoulder height, elbow slightly bent.","Lower slowly."],"Too much weight and swinging your body.","3 sets of 12–15 per arm"],
+["Isolates the side of the shoulder.",["Set the seat so your shoulder lines up with the pivot.","Rest your arms on the pads.","Raise to shoulder height.","Lower slowly without letting the stack touch down."],"Shrugging as you lift.","3 sets of 12–15"],
+["Isolates the front of the shoulder.",["Set the height so your arms start by your thighs.","Hold the handles with arms almost straight.","Raise forward to shoulder height.","Lower under control."],"Going above your head: the traps take over.","3 sets of 12"],
+["Rear shoulder and posture.",["Set the handles or rope at shoulder height.","Pull while opening your arms back.","Squeeze your shoulder blades at the end.","Return slowly."],"Too much weight and pulling with the back.","3 sets of 15"],
+["Vertical row for shoulders and traps.",["Hold the bar or rope with hands shoulder-width apart.","Pull close to your body up to your chest.","Elbows above your hands.","Lower slowly."],"Going above the chest and pinching the shoulders.","3 sets of 12"],
+["Neutral-grip curl for biceps and forearms.",["Hold the rope or handles with palms facing each other.","Elbows close to your body.","Curl up to your shoulder.","Lower under control."],"Moving the elbows forward.","3 sets of 12"],
+["Guided biceps curl.",["Set the seat so your elbow lines up with the machine pivot.","Hold the handles palms up.","Curl to full contraction.","Lower until almost straight."],"Swinging your torso.","3 sets of 10–12"],
+["Elbow extension for the triceps.",["Set the seat or pulley so your elbows stay fixed.","Elbows close to your body.","Straighten your arms fully.","Return slowly to 90°."],"Flaring the elbows during the movement.","3 sets of 12"],
+["Isolates the quads.",["Set the backrest so your knee lines up with the machine pivot.","Pad just above the ankle.","Straighten your legs and hold for 1 second.","Lower slowly."],"Using your hips for momentum.","3 sets of 12–15"],
+["Bodyweight hamstrings. Very demanding.",["Kneel with your heels locked in.","Body in line from head to knee.","Lower forward as slowly as you can.","Catch yourself with your hands and come back up."],"Bending at the hips and losing the body line.","3 sets of 4–6"],
+["Isolates the hamstrings.",["Set the pad just above your heel.","Knee lined up with the pivot.","Pull your heel towards your glutes.","Return slowly."],"Lifting your hips off the bench.","3 sets of 12"],
+["Isolates the calves.",["Set your shoulders or knees under the pads.","Place the balls of your feet on the step.","Rise as high as you can and hold for 1 second.","Lower until you feel the stretch."],"Short, fast reps.","4 sets of 15"],
+["Seated leg press, guided and safe to start with.",["Set the backrest so your knees start at 90°.","Feet hip-width apart in the middle of the platform.","Press without locking your knees.","Return under control."],"Locking the knees out.","3 sets of 12"],
+["45° leg press: quads and glutes with heavy loads.",["Sit with your back and hips fully supported.","Feet shoulder-width apart in the middle of the platform.","Release the locks and lower until your knees reach about 90°.","Press without locking your knees and lock the sled at the end."],"Going too deep and lifting your hips off the seat.","4 sets of 10–12"],
+["Guided squat with heavy loads. Very quad-focused.",["Shoulders under the pads, back against the pad.","Feet hip-width apart, slightly forward.","Release the lock and lower until your knees pass 90°.","Drive up through your whole foot and lock at the end."],"Lifting your heels off the platform.","4 sets of 8–10"],
+["Guided lunge for legs and glutes.",["Set the pads on your shoulders.","One foot forward and one back.","Lower until your back knee almost touches the floor.","Drive up through your front foot."],"Letting the front knee cave in.","3 sets of 10 per leg"],
+["Hip extension with free-swinging legs. Glutes and lower back.",["Lie face down with your hips on the edge.","Hold the handles.","Raise your legs until they line up with your torso.","Lower under control, no swinging."],"Using the pendulum swing.","3 sets of 12"],
+["Loaded hip extension. The best glute exercise.",["Rest your upper back against the pad.","Feet hip-width apart, belt or pad on your hips.","Drive your hips up until your body is in line and squeeze your glutes.","Lower without touching the floor."],"Arching the lower back instead of lifting the hips.","4 sets of 8–12"],
+["Seated leg opening or closing.",["Set the starting range.","Back supported, legs on the pads.","Open or close your legs slowly.","Hold for 1 second and return."],"Using your torso for momentum.","3 sets of 15"],
+["Standing or kneeling hip extension. Isolates the glute.",["Rest your chest or hands on the machine.","Hook your heel or ankle on the pad.","Push back and up with the glute.","Return slowly."],"Arching the lower back at the end.","3 sets of 12 per leg"],
+["Guided crunch with adjustable load.",["Set the seat and hook your feet.","Hold the handles by your chest.","Curl your torso forward.","Return slowly."],"Pulling with your arms.","3 sets of 15"],
+["Cable station for dozens of exercises: chest, back, shoulders and arms.",["Pick the pulley height and the attachment (bar, rope or handle).","Set the load with the pin.","Stand at the right distance so the cable is taut at the start.","Keep constant tension and return slowly."],"Letting the stack touch down between reps.","3 sets of 12"],
+["Cable exercise with constant tension.",["Pick the pulley height and the attachment.","Set the load with the pin.","Use the full range without swinging.","Return slowly."],"Too much weight and using your whole body.","3 sets of 12"]
+];
+const HOW_EN={free:["Set the bench and check the plates or dumbbells before you start.","Ask someone to spot you on maximum loads.","Put the weights back when you finish."],plate:["Set the seat to your height.","Load the plates evenly on both sides.","Control the lowering, 2–3 seconds."],sel:["Set the seat and the weight pin.","Do 2 light test reps.","Full range, no swinging."],cardio:["Start with 3–5 easy minutes.","Pick the programme or level on the screen.","Wipe the machine down when you finish."],glute:["Set the pads to your hips.","Squeeze your glutes at the top for 1 second.","Lower slowly."],leg:["Line your knee up with the machine pivot.","Set the pad just above your ankle.","Control the lowering."],mono:["Set the hooks to the right height.","Ask someone to release the monolift arms.","Always use the side safeties."]};
+const EXACT_EN={
+"Toca no mapa onde estás agora":"Tap the map where you are now","Numa sala, num corredor ou junto a uma máquina. Mais tarde isto passa a ser automático (QR, NFC, Wi-Fi ou Bluetooth).":"In a room, a corridor or next to a machine. Later this becomes automatic (QR, NFC, Wi-Fi or Bluetooth).","Cancelar":"Cancel","Set point":"Set point","Toca dentro de uma sala ou corredor":"Tap inside a room or corridor","Escolhe um músculo para filtrar por tipo.":"Pick a muscle to filter by type.","Idioma / Language":"Language","Ponto marcado":"Pinned point",
+"Da cancela à máquina em 10 segundos":"From the gate to the machine in 10 seconds",
+"Na primeira entrada: encosta o telemóvel à cancela, escolhe o Big Muscle do dia, filtra pelo tipo de exercício e toca numa máquina. O mapa leva-te desde a receção pelas portas e escadas reais.":"On your first visit: tap your phone on the gate, pick today's Big Muscle, filter by exercise type and tap a machine. The map guides you from reception through the real doors and stairs.",
+"Planta mockup v1.9. Máquinas, marcas e posições são de exemplo, distribuídas pela legenda de cada sala.":"Mockup floor plan v1.9. Machines, brands and positions are examples, laid out using each room's legend.",
+"PROTÓTIPO · APP DE SÓCIO":"PROTOTYPE · MEMBER APP","Sobre este protótipo":"About this prototype","Ir para ecrã":"Go to screen","Primeira entrada":"First visit","10 segundos":"10 seconds","atalhos":"shortcuts","400, por sala e fila":"400, by room and row","estou aqui":"I'm here","3 pisos e rota":"3 floors and route","rota otimizada":"optimised route","planta futura":"future floor plan","modo gestor":"manager mode","Tema":"Theme","PRETO & VERMELHO":"BLACK & RED","VERMELHO & CINZA":"RED & GREY",
+"BEM-VINDO À MR BIG EVOLUTION":"WELCOME TO MR BIG EVOLUTION","Encosta à cancela":"Tap the gate","Encosta o telemóvel à etiqueta NFC da cancela de entrada. A app fica a saber que estás na receção.":"Hold your phone to the NFC tag on the entry gate. The app will know you're at reception.","Protótipo: toca no ícone. No iPhone real basta encostar.":"Prototype: tap the icon. On a real iPhone you just hold it close.","Agora não":"Not now","Encostar à cancela de entrada":"Tap the entry gate",
+"Qual o Big Muscle?":"What's your Big Muscle?","FLEX START · PRÓXIMA MR.BIG MACHINE":"FLEX START · NEXT MR.BIG MACHINE","Que músculo?":"Which muscle?","Que tipo de exercício?":"Which exercise type?","toca num músculo":"tap a muscle","toca num tipo":"tap a type","depois do músculo":"after the muscle","todos os tipos":"all types","Escolhe primeiro o músculo, aqui aparecem os tipos dele.":"Pick a muscle first; its exercise types show up here.","Escolhe um tipo e a lista de máquinas aparece logo por baixo.":"Pick a type and the machine list appears right below.","Saltar e ir para o início":"Skip to home","Próxima Mr.Big Machine":"Next Mr.Big Machine","Próxima":"Next","Machine":"Machine","SUGERIDO":"SUGGESTED","ÚLTIMO":"LAST",
+"Livre":"Free","A caminho":"On the way","Ocupada":"In use","· aproxima +":"· zoom in +","Aproximar":"Zoom in","Afastar":"Zoom out","Ver tudo":"Fit all","Salas":"Rooms","Toca numa sala para a ver no mapa.":"Tap a room to see it on the map.","Fechar":"Close","Ver máquinas":"View machines","Toca numa máquina ou numa sala. Arrasta para mover, + e − para aproximar.":"Tap a machine or a room. Drag to move, + and − to zoom.","ESTÁS AQUI":"YOU ARE HERE","Cheguei":"I'm here","Parar":"Stop","ficha":"details","Chegaste.":"You've arrived.","Entra pela receção":"Go in through reception","Sai para o estacionamento":"Go out to the car park","No topo das escadas, entra na Sala 4":"At the top of the stairs, go into Room 4","Ver mais detalhes":"More details","Feito · próxima":"Done · next",
+"COMO USAR":"HOW TO USE","Erro comum:":"Common mistake:","Ver vídeo":"Watch video","Esconder vídeo":"Hide video","[Vídeo de 30 s gravado no ginásio]":"[30-second video filmed at the gym]","+ Ao treino":"+ Add to workout","✓ No treino":"✓ In workout","Estou aqui":"I'm here","✓ Estou aqui":"✓ I'm here","ETIQUETA NFC / QR":"NFC TAG / QR","Ao encostar o telemóvel à etiqueta desta máquina abre-se este ecrã e a app fica a saber que estás aqui.":"Holding your phone to this machine's tag opens this screen and tells the app you're here.","Regista as tuas Mr. BIG Reps":"Log your Mr. BIG Reps","Repetições, peso e dia":"Reps, weight and day","Alternativas perto":"Nearby alternatives","mesmo músculo":"same muscle","Reportar avaria ou peça em falta":"Report a fault or missing part","CÓDIGO":"CODE","FILA · POS.":"ROW · POS.","Ver no mapa":"View on map","Voltar":"Back","Ver detalhe da máquina":"Machine details",
+"PRIMEIRA VEZ NESTA MÁQUINA":"FIRST TIME ON THIS MACHINE","Cria o teu primeiro registo":"Create your first log","Regista as repetições e o peso de cada série. Na próxima vez vês aqui o teu histórico e o teu melhor.":"Log the reps and weight of each set. Next time you'll see your history and your best here.","Regista as tuas":"Log your","REPETIÇÕES":"REPS","PESO (KG)":"WEIGHT (KG)","DIA":"DAY","Guardar série":"Save set","Guardar a primeira série":"Save your first set","Histórico":"History","HISTÓRICO":"HISTORY","ÚLTIMA":"LAST","MELHOR":"BEST","VOLUME HOJE":"VOLUME TODAY","Os registos ficam guardados neste telemóvel.":"Your logs are saved on this phone.","Apagar esta série":"Delete this set","Mais uma repetição":"One more rep","Menos uma repetição":"One less rep","Mais 2,5 kg":"Add 2.5 kg","Menos 2,5 kg":"Remove 2.5 kg","Ver ficha da máquina":"Machine details",
+"O MAIOR GINÁSIO DA EUROPA":"EUROPE'S BIGGEST GYM","Treino":"Train","a sério.":"for real.","máquinas":"machines","pisos":"floors","salas":"rooms","Mudar tema":"Change theme","Modo gestor (planeador)":"Manager mode (planner)","BREVEMENTE":"COMING SOON","Brevemente":"Coming soon","Vê a planta futura e o que vai chegar":"See the future floor plan and what's coming","TREINOS":"WORKOUTS","Escolhe um treino pronto":"Pick a ready-made workout","Peito, costas, pernas, glúteos… com rota pelas salas":"Chest, back, legs, glutes… with a route through the rooms","Repetir a primeira entrada":"Replay the first visit","O MEU TREINO":"MY WORKOUT",
+"Nome, marca ou código (ex. 3-B07)":"Name, brand or code (e.g. 3-B07)","Todas as salas":"All rooms","Nenhuma máquina encontrada.":"No machines found.","Limpar filtros":"Clear filters","Dados de exemplo":"Example data","A mostrar as primeiras 40 filas. Usa os filtros para afinar.":"Showing the first 40 rows. Use the filters to narrow it down.","Máquinas":"Machines","MÁQUINAS":"MACHINES","Música":"Music",
+"TREINOS PRONTOS":"READY-MADE WORKOUTS","Escolhe e segue a rota":"Pick one and follow the route","A app escolhe máquinas da legenda de cada sala e ordena-as a partir de onde estás.":"The app picks machines from each room's legend and orders them from where you are.","Também podes juntar máquinas a partir da ficha de cada uma.":"You can also add machines from each machine's page.","ROTA OTIMIZADA":"OPTIMISED ROUTE","Começar rota":"Start route","Recomeçar":"Start over","Peito + tríceps":"Chest + triceps","Costas + bíceps":"Back + biceps","Ombros + core":"Shoulders + core","Cardio 30 min":"Cardio 30 min","Mais uma série":"One more set","Menos uma série":"One less set","Ainda sem histórico":"No history yet","Quando chegares a uma máquina, regista as tuas Mr. BIG Reps. Aparecem aqui, por músculo e tipo.":"When you reach a machine, log your Mr. BIG Reps. They show up here by muscle and type.","Sem registos com estes filtros.":"No logs with these filters.","toca outra vez para ver todos":"tap again to see all","toca outra vez para limpar":"tap again to clear","opcional":"optional","Tipo":"Type","VOLUME":"VOLUME","SÉRIES":"SETS","Vista":"View",
+"Ler QR / NFC":"Scan QR / NFC","Ler QR ou NFC":"Scan QR or NFC","COMO FUNCIONA":"HOW IT WORKS","Encosta ou aponta":"Tap or point","Cada sala tem um QR na parede e cada máquina uma etiqueta NFC com o seu link. Na app real, o QR abre a câmara e o NFC funciona encostando o telemóvel. Aqui simulas a leitura.":"Every room has a QR code on the wall and every machine an NFC tag with its link. In the real app, the QR opens the camera and NFC works by holding your phone close. Here you simulate the scan.","QR das salas":"Room QR codes","Etiqueta NFC de uma máquina":"A machine's NFC tag","Ler código":"Read code","Simular toque":"Simulate tap","Entrada (estacionamento)":"Entrance (car park)","Receção":"Reception","Sala 3 · centro":"Room 3 · centre","Sala 4 · junto às escadas":"Room 4 · by the stairs","Sala 1 · topo das escadas":"Room 1 · top of the stairs","Mezanino 3 · chegada":"Mezzanine 3 · arrival",
+"PLANTA DE HOJE":"TODAY'S PLAN","PLANTA FUTURA":"FUTURE PLAN","Anúncios":"Announcements","Avisa-me":"Notify me","✓ Vais ser avisado":"✓ You'll be notified","NOVA ZONA":"NEW ZONE","MÁQUINAS NOVAS":"NEW MACHINES","OBRAS":"WORKS","Este mês":"This month","3 máquinas de costas a chegar":"3 back machines on the way","Vão para a Sala 3, fila G. Recebe um aviso quando estiverem montadas.":"They're going to Room 3, row G. Get a heads-up when they're installed.","Mezanino 3 ganha mais cabos":"Mezzanine 3 gets more cables","Durante as obras, parte das polias passa para a Sala 1.":"During the works, some of the pulleys move to Room 1.","Anúncios e datas de exemplo":"Example announcements and dates","Pernas II: mezanino sobre a Sala 6":"Legs II: mezzanine above Room 6","Novo piso por cima das pernas, com mais leg press, hack squats e hip thrusts. Acesso por escadas novas dentro da Sala 6.":"A new floor above the leg room, with more leg presses, hack squats and hip thrusts. Access via new stairs inside Room 6.","Nova zona Pernas II no mezanino":"New Legs II zone on the mezzanine","EM VIGOR":"IN EFFECT","Igual ao Mapa":"Same as the map","PREVIEW":"PREVIEW","Entra em vigor":"Takes effect",
+"Planeador":"Planner","SUPER USER":"SUPER USER","Sair do modo gestor":"Leave manager mode","Versões da planta":"Floor plan versions","Planta atual (v1.9)":"Current plan (v1.9)","Em vigor":"In effect","Anunciada · visível no Brevemente":"Announced · visible in Coming soon","Rascunho":"Draft","Ideia: zona de strongman":"Idea: strongman zone","Rascunho vazio":"Empty draft","RASCUNHO":"DRAFT","Ainda sem alterações":"No changes yet","No PC, arrasta salas e máquinas para a planta. Aqui no telemóvel vês o preview e publicas.":"On a computer, drag rooms and machines onto the plan. Here on the phone you preview and publish.","HOJE":"TODAY","PREVIEW FUTURO":"FUTURE PREVIEW","Zona nova · Piso 1":"New zone · Floor 1","Nome da zona":"Zone name","Anunciar a partir de":"Announce from","Mostrar planta futura no \"Brevemente\"":"Show the future plan in \"Coming soon\"","Publicar anúncio":"Publish announcement","Despublicar anúncio":"Unpublish announcement","Os sócios já veem esta versão no Brevemente. O Mapa só muda na data de entrada em vigor.":"Members can already see this version in Coming soon. The map only changes on the effective date.","Ao publicar, a preview aparece no Brevemente. O Mapa continua igual até à data de entrada em vigor.":"Once published, the preview appears in Coming soon. The map stays the same until the effective date.","Comparar":"Compare",
+"NFC lido · estás na receção":"NFC read · you're at reception","Navegação principal":"Main navigation","INÍCIO":"HOME","Início":"Home","MAPA":"MAP","Mapa":"Map","TREINO":"TRAIN","LER":"SCAN","BREVE":"SOON","Dados, marcas, fotos e estados das máquinas são de exemplo.":"Data, brands, photos and machine statuses are examples.","A app não arrancou":"The app didn't start","Este visualizador mostra o ficheiro mas não corre a app. Abre o link no Safari ou no Chrome.":"This viewer shows the file but can't run the app. Open the link in Safari or Chrome.","P · ESTACIONAMENTO":"P · CAR PARK","CORREDOR ENTRADA / SAÍDA":"ENTRY / EXIT CORRIDOR","PISTA":"TRACK","NOVO":"NEW","Ver ficha completa":"Full details","Desde a receção":"From reception"
+};
+const RULES_EN=[
+[/^Ver (.+)$/,'View $1'],
+[/toca noutro para trocar/g,'tap another to switch'],[/a mais perto primeiro/g,'nearest first'],
+[/Sobe as escadas do lado direito da Sala 3/g,'Take the stairs on the right side of Room 3 up'],[/Sobe as escadas em L para o Mezanino 3/g,'Take the L-shaped stairs up to Mezzanine 3'],[/(Sobe|Desce) as escadas da cave/g,(m,v)=>(v==='Sobe'?'Take the basement stairs up':'Take the basement stairs down')],[/(Sobe|Desce) as escadas da plataforma M4/g,(m,v)=>(v==='Sobe'?'Take the M4 platform stairs up':'Take the M4 platform stairs down')],[/(Sobe|Desce) as escadas para a (Sala de Poses|Sala \d)/g,(m,v,r)=>(v==='Sobe'?'Take the stairs up to ':'Take the stairs down to ')+r],[/ até ao /g,' to '],[/Passa para /g,'Go into '],
+[/▲ SOBE AO PISO/g,'▲ UP TO FLOOR'],[/▼ DESCE AO PISO/g,'▼ DOWN TO FLOOR'],[/▲ VENS DO PISO/g,'▲ FROM FLOOR'],[/▼ VENS DO PISO/g,'▼ FROM FLOOR'],[/▲ SOBE/g,'▲ UP'],[/▼ DESCE/g,'▼ DOWN'],[/\bver PISO/gi,'see Floor'],
+[/Série guardada: /g,'Set saved: '],[/Estás em: /g,'You are at: '],[/Estás em/g,'You are at'],[/Estás na /g,"You're at "],[/Estás aqui/g,'You are here'],[/Desde a /g,'From '],[/Desde /g,'From '],[/Foto de exemplo: /g,'Example photo: '],
+[/Sugestão: /g,'Suggested: '],[/ · Nível /g,' · Level '],[/Sugestão/g,'Suggestion'],
+[/(\d+) (séries|series) de /g,'$1 sets of '],[/ por braço/g,' per arm'],[/ por perna/g,' per leg'],[/ até à falha técnica/g,' to technical failure'],[/min de aquecimento ou/g,'min warm-up or'],[/min contínuos/g,'min steady'],[/ ou 2000 m/g,' or 2000 m'],
+[/há (\d+) dias/g,'$1 days ago'],[/\bhoje\b/g,'today'],[/\bHoje\b/g,'Today'],[/\bontem\b/g,'yesterday'],[/\bOntem\b/g,'Yesterday'],
+[/(\d+) séries · última /g,'$1 sets · last '],[/\bMelhor\b/g,'Best'],[/(\d+) séries/g,'$1 sets'],[/(\d+) série\b/g,'$1 set'],[/ (SÉRIES|SÉRIE) · /g,' SETS · '],
+[/Faltam (\d+) de (\d+)/g,'$1 of $2 left'],[/(\d+) por fazer/g,'$1 to go'],[/Treino concluído/g,'Workout complete'],[/Boa! Próxima: /g,'Nice! Next: '],[/Adicionada ao treino/g,'Added to workout'],[/Tirada do treino/g,'Removed from workout'],[/Avaria reportada à receção \(simulação\)/g,'Fault reported to reception (simulation)'],[/Indica as repetições e o peso/g,'Enter the reps and the weight'],[/Código não encontrado\. Ex\.: 3-B07/g,'Code not found. E.g. 3-B07'],[/QR lido: /g,'QR read: '],[/NFC: estás na /g,"NFC: you're at the "],[/Posição atualizada: /g,'Position updated: '],[/Posição marcada: /g,'Position set: '],[/Ponto marcado/g,'Pinned point'],[/ máquinas$/g,' machines'],[/Vais receber um aviso/g,"You'll get a heads-up"],[/Aviso desligado/g,'Notification off'],[/Anúncio publicado no Brevemente/g,'Announcement published in Coming soon'],[/Anúncio retirado/g,'Announcement removed'],
+[/Flex Start, passo (\d) de 3/g,'Flex Start, step $1 of 3'],[/Novo: (.+) \(Piso 1, sobre a Sala 6\)/g,'New: $1 (Floor 1, above Room 6)'],[/Nova zona (.+) no mezanino/g,'New $1 zone on the mezzanine'],[/(.+) sobre a Sala 6/g,'$1 above Room 6'],[/Entra em vigor: /g,'Takes effect: '],[/É a planta que os sócios veem no Mapa: 3 pisos, (\d+) máquinas\. Para mudar, cria uma versão nova\./g,"It's the plan members see on the map: 3 floors, $1 machines. To change it, create a new version."],[/ZONA NOVA · M6 · PISO 1/g,'NEW ZONE · M6 · FLOOR 1'],[/PREVIEW · PISO 1/g,'PREVIEW · FLOOR 1'],[/EM VIGOR · PISO 1/g,'IN EFFECT · FLOOR 1'],[/Planta Piso/g,'Floor plan, floor'],
+[/(\d+) MÁQ\./g,'$1 MACH.'],[/(\d+) máq\./g,'$1 mach.'],[/(\d+) máquinas/g,'$1 machines'],
+[/Sala de Poses/g,'Posing room'],[/SALA DE POSES/g,'POSING ROOM'],[/Mezaninos/g,'Mezzanines'],[/Mezanino/g,'Mezzanine'],[/MEZANINO/g,'MEZZANINE'],[/\bSalas\b/g,'Rooms'],[/\bSala\b/g,'Room'],[/\bSALA\b/g,'ROOM'],[/\bsala\b/g,'room'],[/\bFila\b/g,'Row'],[/\bfila\b/g,'row'],[/\bFILA\b/g,'ROW'],[/\bPisos\b/g,'Floors'],[/\bPiso\b/g,'Floor'],[/\bPISO\b/g,'FLOOR'],[/\bCave\b/g,'Basement'],[/\bCAVE\b/g,'BASEMENT'],[/Receção \(cancela de entrada\)/g,'Reception (entry gate)'],[/\bReceção\b/g,'Reception'],[/\breceção\b/g,'reception'],[/\bRECEÇÃO\b/g,'RECEPTION'],[/\bCorredor\b/g,'Corridor'],[/\bPista\b/g,'Track'],
+[/Peso livre/g,'Free weight'],[/Seletorizada/g,'Selectorized'],[/PESO LIVRE/g,'FREE WEIGHT'],[/SELETORIZADA/g,'SELECTORIZED'],[/PLATE LOADED/g,'PLATE LOADED'],
+[/\bIniciante\b/g,'Beginner'],[/\bRegular\b/g,'Intermediate'],[/\bAvançado\b/g,'Advanced'],[/\bNível\b/g,'Level'],
+[/Elevação lateral/g,'Lateral raise'],[/Elevação frontal/g,'Front raise'],[/Remada alta/g,'Upright row'],[/Multi-articular/g,'Compound'],[/Acima da cabeça/g,'Overhead'],[/Reverse hyper/g,'Reverse hyper'],
+[/\bPeito\b/g,'Chest'],[/\bCostas\b/g,'Back'],[/\bOmbros\b/g,'Shoulders'],[/\bBíceps\b/g,'Biceps'],[/\bTríceps\b/g,'Triceps'],[/\bPernas\b/g,'Legs'],[/\bGlúteos\b/g,'Glutes'],[/\bGémeos\b/g,'Calves'],[/\bTodos\b/g,'All'],[/\btodos\b/g,'all'],
+[/\bHalteres\b/g,'Dumbbells'],[/\bOutros\b/g,'Other'],[/\bInclinado\b/g,'Incline'],[/\bDeclinado\b/g,'Decline'],[/\bAberturas\b/g,'Flyes'],[/\bPuxada\b/g,'Pulldown'],[/\bRemada\b/g,'Row'],[/\bLombar\b/g,'Lower back'],[/\bTrapézio\b/g,'Traps'],[/\bScott\b/g,'Preacher'],[/\bMartelo\b/g,'Hammer'],[/\bExtensão\b/g,'Extension'],[/\bPolia\b/g,'Cable'],[/\bFlexão\b/g,'Leg curl'],[/\bAdutores\b/g,'Adductors'],[/\bCoice\b/g,'Kickback'],[/\bAbdução\b/g,'Abduction'],[/\bEm pé\b/g,'Standing'],[/\bSentado\b/g,'Seated'],[/\bTibial\b/g,'Tibialis'],[/\bPosterior\b/g,'Rear delt'],
+[/\bmin a pé\b/g,'min walk'],[/\bconjunto\b/g,'set']
+];
+const NAME_KEYS=Object.keys(NAMES_EN).sort((a,b)=>b.length-a.length);
+const EXACT_KEYS_UP={};Object.keys(EXACT_EN).forEach(k=>{EXACT_KEYS_UP[k.toUpperCase()]=EXACT_EN[k].toUpperCase();});
+const GUIDE_MAP={};GUIDE.forEach((g,i)=>{const e=GUIDE_EN[i];if(!e)return;GUIDE_MAP[g[2]]=e[0];g[3].forEach((t,j)=>GUIDE_MAP[t]=e[1][j]);GUIDE_MAP[g[4]]=e[2];GUIDE_MAP[g[5]]=e[3];});
+Object.keys(HOW).forEach(k=>HOW[k].forEach((t,j)=>{GUIDE_MAP[t]=HOW_EN[k][j];}));
+Object.keys(FUNC_EN).forEach(k=>{if(PLAN.functions&&PLAN.functions[k])GUIDE_MAP[PLAN.functions[k]]=FUNC_EN[k];});
+const esc2=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+const NAME_RE=new RegExp('(^|[^\\p{L}])('+NAME_KEYS.map(esc2).join('|')+')(?![\\p{L}])','gu');
+function tr(s){
+  if(S.lang!=='en'||!s)return s;
+  const lead=s.match(/^\s*/)[0],trail=s.match(/\s*$/)[0];let t=s.trim();if(!t)return s;
+  if(EXACT_EN[t]!==undefined)return lead+EXACT_EN[t]+trail;
+  if(GUIDE_MAP[t]!==undefined)return lead+GUIDE_MAP[t]+trail;
+  if(/\p{L}/u.test(t)&&t===t.toUpperCase()&&EXACT_KEYS_UP[t]!==undefined)return lead+EXACT_KEYS_UP[t]+trail;
+  // machine names first, then guides inside composite text, then phrase rules
+  t=t.replace(NAME_RE,(m,p,n)=>p+NAMES_EN[n]);
+  Object.keys(GUIDE_MAP).forEach(k=>{if(k.length>12&&t.includes(k))t=t.split(k).join(GUIDE_MAP[k]);});
+  for(const [re,rep] of RULES_EN)t=t.replace(re,rep);
+  return lead+t+trail;}
+function i18nDOM(root){
+  document.documentElement.lang=S.lang==='en'?'en':'pt';
+  const en=S.lang==='en';
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;
+  while(n=w.nextNode()){const p=n.parentElement;if(!p||p.tagName==='SCRIPT'||p.tagName==='STYLE')continue;
+    if(n.__pt===undefined){if(!en)continue;n.__pt=n.nodeValue;}
+    const v=en?tr(n.__pt):n.__pt;if(v!==n.nodeValue)n.nodeValue=v;}
+  root.querySelectorAll('[aria-label],[placeholder],[alt],[title]').forEach(e=>['aria-label','placeholder','alt','title'].forEach(k=>{const key='__pt_'+k;let o=e[key];const cur=e.getAttribute(k);if(o===undefined){if(!en||!cur)return;o=e[key]=cur;}const v=en?tr(o):o;if(v!==cur)e.setAttribute(k,v);}));
+}
+
+/* ================= router ================= */
+let LASTH='';
+function current(){return (location.hash||'#inicio').slice(1)||'inicio';}
+function render(){
+  document.documentElement.setAttribute('data-app',S.theme);
+  document.querySelectorAll('[data-act="theme-set"]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===S.theme)));
+  const h=current();let html,tab=h;
+  if(h.startsWith('m-')){const code=(M.find(m=>m.slug===h)||{}).code;html=vMaquina(code);tab='maquinas';}
+  else if(h.startsWith('reps-')){const m=M.find(x=>'reps-'+x.slug===h);html=vReps(m&&m.code);tab='mapa';}else if(h==='breve')html=vBreve();else if(h==='gestor'){html=vGestor();tab='';}else if(h==='entrada')html=vEntrada();else if(h==='bigmuscle')html=vBig();else if(h==='musculo'){html=vMusculo();tab='maquinas';}
+  else if(h==='maquinas')html=vMaquinas();else if(h==='mapa')html=vMapa();else if(h==='treino')html=vTreino();else if(h==='ler')html=vLer();else{html=vInicio();tab='inicio';}
+  const oldBody=document.querySelector('#view .body');const keep=(h===LASTH&&oldBody)?oldBody.scrollTop:0;LASTH=h;
+  document.getElementById('view').innerHTML=html;
+  const nb=document.querySelector('#view .body');if(nb&&keep)nb.scrollTop=keep;
+  document.getElementById('tabs').hidden=(h==='entrada');document.getElementById('nextbar').hidden=false;
+  if(S.scrollTo){const t=document.getElementById(S.scrollTo);S.scrollTo='';if(t)t.scrollIntoView({block:'start'});}
+  if(h==='maquinas')document.getElementById('results').innerHTML=results();
+  document.getElementById('tabs').innerHTML=TABS.map(t=>t[0]==='ler'?`<a class="scan" href="#ler"${tab==='ler'?' aria-current="page"':''} aria-label="Ler QR ou NFC"><span>${ic('qr',22)}</span></a>`:`<a href="#${t[0]}"${tab===t[0]?' aria-current="page"':''}>${ic(t[2])}${t[1]}${t[0]==='treino'&&S.treino.length?` (${S.treino.length})`:''}</a>`).join('');
+  if(h==='mapa')bindMap();
+  i18nDOM(document.body);
+}
+window.addEventListener('hashchange',()=>{LASTH='';S.howto=false;render();});
+let tt;function toast(msg){const t=document.getElementById('toast');t.textContent=tr(msg);t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,1800);}
+
+/* map pan / zoom */
+let RZ;function reRenderSoon(){clearTimeout(RZ);RZ=setTimeout(()=>{if(current()==='mapa')render();},260);}
+function toWorld(svg,cx,cy){const pt=svg.createSVGPoint();pt.x=cx;pt.y=cy;return pt.matrixTransform(svg.getScreenCTM().inverse());}
+function zoomAt(nz,cx,cy){const svg=document.getElementById('mapsvg');if(!svg)return;nz=Math.max(1,Math.min(6,nz));const a=toWorld(svg,cx,cy);S.zoom=nz;svg.setAttribute('viewBox',viewBox().join(' '));const b=toWorld(svg,cx,cy);S.pan=[S.pan[0]+a.x-b.x,S.pan[1]+a.y-b.y];if(nz===1)S.pan=[0,0];svg.setAttribute('viewBox',viewBox().join(' '));}
+function setPointAt(cx,cy){const svg=document.getElementById('mapsvg');if(!svg)return;const w=toWorld(svg,cx,cy);
+  const r=PLAN.rooms.filter(r=>r.floor===S.floor&&(r.rect||r.polygon)).find(r=>inPoly(w.x,w.y,poly(r)));
+  if(!r){toast('Toca dentro de uma sala ou corredor');return;}
+  S.pos={id:'pt',label:'Ponto marcado · '+RNAME(r.id),f:S.floor,x:+w.x.toFixed(2),y:+w.y.toFixed(2),room:r.id};S.setPoint=false;save();toast('Posição marcada: '+RNAME(r.id));render();}
+function bindMap(){const w=document.getElementById('mapwrap');if(!w)return;const P=new Map();let drag=null,pinch=null,lastTap=0;
+  w.addEventListener('pointerdown',e=>{if(e.target.closest('button,.mappop'))return;P.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(P.size===2){const [p1,p2]=[...P.values()];pinch={d:Math.hypot(p1.x-p2.x,p1.y-p2.y),z:S.zoom};drag=null;}
+    else drag={x:e.clientX,y:e.clientY,p:S.pan.slice(),moved:false};});
+  w.addEventListener('pointermove',e=>{if(!P.has(e.pointerId))return;P.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(pinch&&P.size===2){const [p1,p2]=[...P.values()];const d=Math.hypot(p1.x-p2.x,p1.y-p2.y);zoomAt(pinch.z*d/pinch.d,(p1.x+p2.x)/2,(p1.y+p2.y)/2);return;}
+    if(!drag)return;const svg=document.getElementById('mapsvg');const vb=viewBox();const k=vb[2]/svg.clientWidth*Math.max(1,(vb[3]/svg.clientHeight)/(vb[2]/svg.clientWidth));const dx=(e.clientX-drag.x),dy=(e.clientY-drag.y);if(Math.abs(dx)+Math.abs(dy)>4)drag.moved=true;if(!drag.moved)return;S.pan=[drag.p[0]-dx*k,drag.p[1]-dy*k];svg.setAttribute('viewBox',viewBox().join(' '));});
+  const end=e=>{const wasPinch=!!pinch;P.delete(e.pointerId);if(P.size<2&&pinch){pinch=null;reRenderSoon();}
+    if(wasPinch){drag=null;return;}const d=drag;drag=null;if(e.type!=='pointerup')return;if(d&&d.moved){reRenderSoon();return;}
+    if(S.setPoint){setPointAt(e.clientX,e.clientY);return;}
+    const el=e.target.closest('[data-act]');if(el&&el.closest('svg')){act(el.dataset.act,el);return;}
+    const now=Date.now();if(now-lastTap<300){zoomAt(S.zoom*1.8,e.clientX,e.clientY);reRenderSoon();}lastTap=now;};
+  w.addEventListener('pointerup',end);w.addEventListener('pointercancel',end);
+  w.addEventListener('wheel',e=>{e.preventDefault();zoomAt(S.zoom*Math.exp(-e.deltaY*0.0022),e.clientX,e.clientY);reRenderSoon();},{passive:false});
+}
+
+/* ================= actions ================= */
+function setPos(p,msg){S.pos=p;save();toast(msg||('Estás em: '+p.label));}
+function act(a,el){const d=el.dataset;
+  switch(a){
+  case 'theme':S.theme=S.theme==='preto'?'cinza':'preto';save();render();break;
+  case 'theme-set':S.theme=d.v;save();render();break;
+  case 'planview':S.planView=d.v;render();break;
+  case 'follow':S.follows[d.id]=!S.follows[d.id];save();toast(S.follows[d.id]?'Vais receber um aviso':'Aviso desligado');render();break;
+  case 'adm-ver':S.admVer=d.v;render();break;
+  case 'adm-floor':S.admFloor=+d.v;render();break;
+  case 'admview':S.admView=d.v;render();break;
+  case 'showsoon':S.showSoon=el.checked;save();render();break;
+  case 'publish':S.pub=!S.pub;save();toast(S.pub?'Anúncio publicado no Brevemente':'Anúncio retirado');render();break;
+  case 'gate':S.flow=true;S.big=[];S.type='';S.pos=Object.assign({},GATE);S.floor=0;save();toast('NFC lido · estás na receção');location.hash='musculo';break;
+  case 'skip-onb':S.onb=true;save();location.hash='inicio';break;
+  case 'reset-onb':S.onb=false;S.big=[];S.type='';save();location.hash='entrada';break;
+  case 'big-pick':{const mu=d.v;S.lastMu=mu;const inFlow=current()==='musculo'||current()==='bigmuscle';if(inFlow&&S.big[0]===mu){S.big=[];S.type='';render();break;}S.big=[mu];S.hist[mu]=today();S.type='';S.onb=true;S.flow=true;save();if(inFlow)render();else location.hash='musculo';break;}
+  case 'next-bar':S.flow=true;S.big=[];S.type='';S.target=null;S.nav=false;S.fromTreino=false;S.sel=null;if(current()==='musculo'){LASTH='';render();}else location.hash='musculo';break;
+  case 'big-toggle':{const m=d.m;S.big=S.big.includes(m)?S.big.filter(x=>x!==m):S.big.concat([m]);S.type='';save();render();break;}
+  case 'big-go':if(!S.big.length)break;S.onb=true;S.type='';save();location.hash='musculo';break;
+  case 'back-big':S.big=[];S.type='';location.hash='musculo';break;
+  case 'type':S.type=(S.type===d.v)?'':d.v;if(S.big[0]&&S.type&&S.type!=='Todos'){S.lastType[S.big[0]]=S.type;save();}S.scrollTo=S.type?'sec3':'';render();break;
+  case 'pick':{const m=BYCODE[d.c];S.flow=true;location.hash=m.slug;break;}
+  case 'flex-start':S.flow=true;S.big=[];S.type='';location.hash='musculo';break;
+  case 'muscle-go':S.muscle=d.m;S.room='Todas';S.q='';location.hash='maquinas';break;
+  case 'muscle':S.muscle=d.m||d.v;S.mType='';render();break;
+  case 'setpoint':S.setPoint=!S.setPoint;S.pop=null;S.roomsOpen=false;render();break;
+  case 'mtype':S.mType=S.mType===d.v?'':d.v;render();break;
+  case 'lang':S.lang=d.v;save();render();break;
+  case 'stair':{const T=STAIR_UI_T[+d.v];S.floor=T[0];S.pop=null;S.roomsOpen=false;S.roomSel=T[3];focusOn(T[1],T[2],2.2);render();break;}
+  case 'roomf':S.room=d.r;render();break;
+  case 'clear':S.q='';S.muscle='Todos';S.room='Todas';render();break;
+  case 'rooms-toggle':S.roomsOpen=!S.roomsOpen;S.pop=null;render();break;
+  case 'room-go':S.roomsOpen=false;S.floor=ROOMS[d.r].floor;S.roomSel=d.r;S.sel=null;S.nav=false;const p=LABELPOS[d.r];focusOn(p[0],p[1],1.8);if(current()==='mapa')render();else location.hash='mapa';break;
+  case 'room':S.roomSel=d.r;S.sel=null;render();break;
+  case 'room-list':S.room=d.r;S.muscle='Todos';S.q='';location.hash='maquinas';break;
+  case 'room-clear':S.roomSel=null;render();break;
+  case 'back':if(history.length>1)history.back();else location.hash='maquinas';break;
+  case 'howto':S.howto=!S.howto;render();break;
+  case 'treino-toggle':{const c=d.c;if(S.treino.includes(c)){S.treino=S.treino.filter(x=>x!==c);toast('Tirada do treino');}else{S.treino.push(c);toast('Adicionada ao treino');}save();render();break;}
+  case 'here':{const m=BYCODE[d.c];const arrived=S.target===m.code&&S.nav;setPos({id:'m:'+m.code,code:m.code,label:m.nameN+' ('+m.code+')',f:m.f,x:m.x,y:m.y,room:m.room});if(S.target===m.code){S.nav=false;S.flow=false;if(S.fromTreino){S.done[m.code]=true;save();}}if(arrived){location.hash='reps-'+m.slug;}else render();break;}
+  case 'lg':{const c=current().replace('reps-','');const m=M.find(x=>x.slug===c);const F=S.form[m.code];F[d.f]=Math.max(d.f==='reps'?1:0,Math.round(((+F[d.f]||0)+(+d.v))*10)/10);render();break;}
+  case 'lg-save':{const F=S.form[d.c];const reps=Math.round(+F.reps),kg=+F.kg;if(!(reps>0)||!(kg>=0)){toast('Indica as repetições e o peso');break;}(S.log[d.c]=S.log[d.c]||[]).push({d:F.day||today(),reps,kg,t:Date.now()});save();toast('Série guardada: '+reps+' × '+kg+' kg');render();break;}
+  case 'next-machine':{const m=BYCODE[d.c];const left=S.treino.filter(c=>!S.done[c]&&c!==m.code);
+    if(left.length){S.done[m.code]=true;save();act('treino-start',el);break;}
+    const mu=nextMu(m);S.big=[mu];S.type='';S.flow=true;S.target=null;S.nav=false;location.hash='musculo';break;}
+  case 'lg-del':{S.log[d.c]=(S.log[d.c]||[]).filter(x=>String(x.t)!==d.v);save();render();break;}
+  case 'report':toast('Avaria reportada à receção (simulação)');break;
+  case 'go-map':case 'go':{const m=BYCODE[d.c];S.pop=null;S.target=m.code;S.sel=null;S.nav=true;S.fromTreino=false;S.floor=S.pos.f;focusRoute(m);if(current()!=='mapa')location.hash='mapa';else render();break;}
+  case 'mdot':S.pop=d.c;S.roomSel=null;render();break;
+  case 'pop-close':S.pop=null;render();break;
+  case 'nav-stop':S.flow=false;S.nav=false;S.target=null;S.fromTreino=false;render();break;
+  case 'floor':S.floor=+d.v;if(S.nav&&S.target)focusRoute(BYCODE[S.target],S.floor);render();break;
+  case 'zin':S.zoom=Math.min(6,S.zoom*1.5);render();break;
+  case 'zout':S.zoom=Math.max(1,S.zoom/1.5);if(S.zoom===1)S.pan=[0,0];render();break;
+  case 'zfit':S.zoom=1;S.pan=[0,0];render();break;
+  case 'qr':{const q=QRS.find(x=>x.id===d.v);setPos(Object.assign({},q),'QR lido: '+q.label);S.floor=q.f;render();break;}
+  case 'nfc-code':{const v=(document.getElementById('code').value||'').trim().toUpperCase();const m=BYCODE[v];if(!m){toast('Código não encontrado. Ex.: 3-B07');break;}setPos({id:'m:'+m.code,code:m.code,label:m.nameN+' ('+m.code+')',f:m.f,x:m.x,y:m.y,room:m.room},'NFC: estás na '+m.nameN);location.hash=m.slug;break;}
+  case 'nfc-rand':{const m=M[Math.floor(Math.random()*M.length)];setPos({id:'m:'+m.code,code:m.code,label:m.nameN+' ('+m.code+')',f:m.f,x:m.x,y:m.y,room:m.room},'NFC: estás na '+m.nameN);location.hash=m.slug;break;}
+  case 'load':S.treino=buildTemplate(+d.v);S.done={};S.sets={};save();render();break;
+  case 'set+':S.sets[d.c]=Math.min(4,(S.sets[d.c]||0)+1);if(S.sets[d.c]===4)S.done[d.c]=true;save();render();break;
+  case 'set-':S.sets[d.c]=Math.max(0,(S.sets[d.c]||0)-1);if(S.sets[d.c]<4)delete S.done[d.c];save();render();break;
+  case 'treino-reset':S.done={};S.sets={};S.treino=[];S.fromTreino=false;save();render();break;
+  case 'tview':S.tview=d.v;render();break;
+  case 'h-mu':S.hMu=S.hMu===d.v?'':d.v;S.hType='';render();break;
+  case 'h-type':S.hType=S.hType===d.v?'':d.v;render();break;
+  case 'treino-clear':S.treino=[];S.done={};S.sets={};save();render();break;
+  case 'treino-start':{const n=orderTreino().find(c=>!S.done[c]);if(!n)break;S.target=n;S.nav=true;S.fromTreino=true;S.floor=S.pos.f;focusOn(S.pos.x,S.pos.y,1.6);location.hash='mapa';break;}
+  case 'treino-next':{const cur=BYCODE[S.target];S.done[cur.code]=true;S.sets[cur.code]=Math.max(S.sets[cur.code]||0,4);S.pos={id:'m:'+cur.code,code:cur.code,label:cur.nameN+' ('+cur.code+')',f:cur.f,x:cur.x,y:cur.y,room:cur.room};
+    const n=orderTreino().find(c=>!S.done[c]);save();if(n){S.target=n;S.floor=S.pos.f;toast('Boa! Próxima: '+BYCODE[n].nameN);}else{S.target=null;S.nav=false;S.fromTreino=false;toast('Treino concluído');}render();break;}
+  }}
+document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if(!el||el.tagName==='INPUT'||el.closest('svg'))return;act(el.dataset.act,el);});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='code')act('nfc-code',e.target);});
+document.addEventListener('change',e=>{const el=e.target;if(el.id==='showSoon')act('showsoon',el);if(el.id==='dAnn')S.dateAnn=el.value;if(el.id==='dLive')S.dateLive=el.value;if(el.id==='m2name'){S.m2name=el.value.trim()||'Pernas II';save();}});
+document.addEventListener('input',e=>{const id=e.target.id;if(id==='lgReps'||id==='lgKg'||id==='lgDay'){const c=current().replace('reps-','');const m=M.find(x=>x.slug===c);if(m){const F=S.form[m.code];if(id==='lgReps')F.reps=e.target.value;if(id==='lgKg')F.kg=e.target.value;if(id==='lgDay')F.day=e.target.value||today();}return;}if(e.target.id==='q'){S.q=e.target.value;document.getElementById('results').innerHTML=results();}});
+// first time: entry gate (NFC) -> Big Muscle -> list -> map
+if(!S.onb&&!location.hash.startsWith('#m-')&&current()!=='entrada'&&current()!=='bigmuscle')history.replaceState(null,'','#entrada');
+// opening a machine link from an NFC tag also tells the app where you are
+if(location.hash.startsWith('#m-')){const m=M.find(x=>'#'+x.slug===location.hash);if(m){S.pos={id:'m:'+m.code,code:m.code,label:m.nameN+' ('+m.code+')',f:m.f,x:m.x,y:m.y,room:m.room};save();}}
+render();
+})();
+</script>

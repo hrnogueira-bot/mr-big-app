@@ -1,0 +1,771 @@
+{
+ "schema": "mrbig-planta/1",
+ "version": "1.9",
+ "updated": "2026-10-28",
+ "status": "mockup da planta: formas simplificadas a partir do desenho do Hugo",
+ "units": "metros",
+ "frame": "Eixo do pavilhão: x para nascente, y para sul, origem no canto noroeste. O pavilhão está rodado cerca de 10,4° em relação ao norte. Mockup: salas 2, 7 e 8 alargadas para caberem os nomes.",
+ "rotationToNorthDeg": 10.4,
+ "floors": [
+  {
+   "level": -1,
+   "name": "Piso -1 · Cave"
+  },
+  {
+   "level": 0,
+   "name": "Piso 0 · Rés-do-chão"
+  },
+  {
+   "level": 1,
+   "name": "Piso 1 · Mezaninos"
+  }
+ ],
+ "rooms": [
+  {
+   "id": "0",
+   "label": "0",
+   "floor": 0,
+   "kind": "entrada",
+   "rect": [
+    28,
+    97,
+    15,
+    10
+   ],
+   "note": "Entrada e receção: 10 m de profundidade, centrada no fundo sul; sem mezanino por cima",
+   "name": "Receção"
+  },
+  {
+   "id": "1",
+   "label": "1",
+   "floor": 0,
+   "kind": "sala",
+   "rect": [
+    50,
+    53,
+    21,
+    50
+   ],
+   "name": "Sala 1",
+   "note": "Fechada para a sala 3; acesso só por baixo, pelo corredor e escadas"
+  },
+  {
+   "id": "2",
+   "label": "2",
+   "floor": 0,
+   "kind": "sala",
+   "rect": [
+    50,
+    4,
+    9,
+    49
+   ],
+   "name": "Sala 2"
+  },
+  {
+   "id": "3",
+   "label": "3",
+   "floor": 0,
+   "kind": "sala",
+   "polygon": [
+    [
+     21,
+     53
+    ],
+    [
+     50,
+     53
+    ],
+    [
+     50,
+     107
+    ],
+    [
+     43,
+     107
+    ],
+    [
+     43,
+     97
+    ],
+    [
+     28,
+     97
+    ],
+    [
+     28,
+     107
+    ],
+    [
+     21,
+     107
+    ]
+   ],
+   "note": "Rodeia a receção (zona 0) pelos dois lados no fundo sul",
+   "name": "Sala 3"
+  },
+  {
+   "id": "4",
+   "label": "4",
+   "floor": 0,
+   "kind": "sala",
+   "polygon": [
+    [
+     21,
+     28
+    ],
+    [
+     45,
+     4
+    ],
+    [
+     50,
+     4
+    ],
+    [
+     50,
+     53
+    ],
+    [
+     21,
+     53
+    ]
+   ],
+   "name": "Sala 4"
+  },
+  {
+   "id": "5",
+   "label": "5",
+   "floor": 0,
+   "kind": "sala",
+   "polygon": [
+    [
+     0,
+     38.5
+    ],
+    [
+     2.3,
+     38.5
+    ],
+    [
+     21,
+     28
+    ],
+    [
+     21,
+     53
+    ],
+    [
+     0,
+     53
+    ]
+   ],
+   "note": "Inclui o triângulo junto à parede diagonal da sala 4 e a faixa a poente",
+   "name": "Sala 5",
+   "heightGroup": "5-6-8"
+  },
+  {
+   "id": "6",
+   "label": "6",
+   "floor": 0,
+   "kind": "sala",
+   "rect": [
+    0,
+    53,
+    14,
+    44
+   ],
+   "name": "Sala 6",
+   "heightGroup": "5-6-8"
+  },
+  {
+   "id": "7",
+   "label": "P",
+   "floor": 0,
+   "kind": "sala",
+   "rect": [
+    4,
+    97,
+    10,
+    7
+   ],
+   "name": "Sala de Poses"
+  },
+  {
+   "id": "8",
+   "label": "7",
+   "floor": 0,
+   "kind": "sala",
+   "rect": [
+    14,
+    53,
+    7,
+    54
+   ],
+   "name": "Sala 7",
+   "heightGroup": "5-6-8"
+  },
+  {
+   "id": "M4",
+   "label": "M4",
+   "floor": 1,
+   "kind": "mezanino",
+   "over": "4",
+   "rect": [
+    28.5,
+    29.5,
+    14.0,
+    16
+   ],
+   "note": "Plataforma; sobe-se por escadas dentro da área, a partir de baixo",
+   "name": "Mezanino 4"
+  },
+  {
+   "id": "M3",
+   "label": "M3",
+   "floor": 1,
+   "kind": "mezanino",
+   "over": "3",
+   "note": "3 m de margem de cada lado face à sala 3; cobre a profundidade toda, de ponta a ponta; a receção (zona 0) fica fora; estrangulamento a meio-baixo (cunhas laterais) antes da faixa junto à receção",
+   "polygon": [
+    [
+     24,
+     53
+    ],
+    [
+     47,
+     53
+    ],
+    [
+     47,
+     85.5
+    ],
+    [
+     41,
+     89.3
+    ],
+    [
+     47,
+     93
+    ],
+    [
+     47,
+     107
+    ],
+    [
+     43,
+     107
+    ],
+    [
+     43,
+     97
+    ],
+    [
+     28,
+     97
+    ],
+    [
+     28,
+     107
+    ],
+    [
+     24,
+     107
+    ],
+    [
+     24,
+     93
+    ],
+    [
+     30,
+     89.3
+    ],
+    [
+     24,
+     85.5
+    ]
+   ],
+   "name": "Mezanino 3"
+  },
+  {
+   "id": "C6",
+   "label": "C6",
+   "floor": -1,
+   "kind": "cave",
+   "under": [
+    "6",
+    "8"
+   ],
+   "polygon": [
+    [
+     0,
+     53
+    ],
+    [
+     21,
+     53
+    ],
+    [
+     21,
+     107
+    ],
+    [
+     14,
+     107
+    ],
+    [
+     14,
+     97
+    ],
+    [
+     0,
+     97
+    ]
+   ],
+   "name": "Cave"
+  },
+  {
+   "id": "C",
+   "label": "C",
+   "floor": 0,
+   "kind": "corredor",
+   "polygon": [
+    [
+     0,
+     97
+    ],
+    [
+     4,
+     97
+    ],
+    [
+     4,
+     104
+    ],
+    [
+     14,
+     104
+    ],
+    [
+     14,
+     107
+    ],
+    [
+     50,
+     107
+    ],
+    [
+     50,
+     103
+    ],
+    [
+     71,
+     103
+    ],
+    [
+     71,
+     110
+    ],
+    [
+     0,
+     110
+    ]
+   ],
+   "note": "Corredor a sul, de ponta a ponta; dá acesso à sala 7 (detalhe a explicar)",
+   "name": "Corredor de entrada / saída"
+  },
+  {
+   "id": "PISTA",
+   "label": "Pista",
+   "floor": 1,
+   "kind": "pista",
+   "stadium": {
+    "x": 22,
+    "y": 23,
+    "w": 27,
+    "h": 29,
+    "width": 3
+   },
+   "note": "Pista oval à volta da plataforma M4, maior do que ela",
+   "name": "Pista"
+  }
+ ],
+ "open": [
+  "Sentido das escadas do M4 (assumido: sobe para norte)",
+  "Balneários"
+ ],
+ "links": [
+  {
+   "id": "P1",
+   "type": "passagem",
+   "rooms": [
+    "4",
+    "2"
+   ],
+   "floor": 0,
+   "wall": [
+    [
+     50,
+     4
+    ],
+    [
+     50,
+     8
+    ]
+   ]
+  },
+  {
+   "id": "P2",
+   "type": "passagem",
+   "rooms": [
+    "5",
+    "6"
+   ],
+   "floor": 0,
+   "wall": [
+    [
+     9.5,
+     53
+    ],
+    [
+     14,
+     53
+    ]
+   ]
+  },
+  {
+   "id": "P3",
+   "type": "passagem",
+   "rooms": [
+    "2",
+    "1"
+   ],
+   "floor": 0,
+   "wall": [
+    [
+     52,
+     53
+    ],
+    [
+     56,
+     53
+    ]
+   ],
+   "note": "mesmo piso"
+  },
+  {
+   "id": "P4",
+   "type": "passagem",
+   "rooms": [
+    "6",
+    "8"
+   ],
+   "floor": 0,
+   "wall": [
+    [
+     14,
+     73
+    ],
+    [
+     14,
+     81
+    ]
+   ]
+  },
+  {
+   "id": "P6",
+   "type": "passagem",
+   "rooms": [
+    "0",
+    "3"
+   ],
+   "floor": 0,
+   "wall": [
+    [
+     43,
+     101
+    ],
+    [
+     43,
+     103.6
+    ]
+   ],
+   "note": "saída da receção para a sala 3"
+  },
+  {
+   "id": "E1",
+   "type": "entrada",
+   "rooms": [
+    "C",
+    "0"
+   ],
+   "floor": 0,
+   "wall": [
+    [
+     37,
+     107
+    ],
+    [
+     43,
+     107
+    ]
+   ],
+   "note": "entrada principal"
+  },
+  {
+   "id": "S1",
+   "type": "escadas",
+   "rooms": [
+    "4",
+    "5"
+   ],
+   "floor": 0,
+   "rect": [
+    16.5,
+    50.3,
+    6.5,
+    2.4
+   ],
+   "note": "A mais próxima do fundo da sala 4: sobe para a sala 5 (5, 6 e 8 estão à mesma altura)",
+   "up": "W"
+  },
+  {
+   "id": "S2",
+   "type": "escadas",
+   "rooms": [
+    "4",
+    "C6"
+   ],
+   "floor": 0,
+   "toFloor": -1,
+   "to": "C6",
+   "note": "Logo acima das escadas para a sala 5: em L, desce da sala 4 para a cave, por baixo da sala 8",
+   "path": [
+    [
+     23,
+     47.8
+    ],
+    [
+     15.3,
+     47.8
+    ],
+    [
+     15.3,
+     60
+    ]
+   ],
+   "width": 2.2,
+   "up": "start",
+   "groundEnd": 53
+  },
+  {
+   "id": "S3",
+   "type": "escadas",
+   "rooms": [
+    "2",
+    "4"
+   ],
+   "floor": 0,
+   "rect": [
+    47.5,
+    47.6,
+    3.5,
+    2.2
+   ],
+   "note": "Da sala 4 sobe-se para a sala 2 (a 2 é mais alta)",
+   "up": "E"
+  },
+  {
+   "id": "S4",
+   "type": "escadas",
+   "rooms": [
+    "3",
+    "M3",
+    "4"
+   ],
+   "floor": 0,
+   "toFloor": 1,
+   "to": "M3",
+   "note": "Lado direito da sala 3: sobe para norte (no topo dá para a sala 4) e vira em L para a esquerda, a subir para o mezanino M3",
+   "up": "end",
+   "path": [
+    [
+     48.15,
+     63.4
+    ],
+    [
+     48.15,
+     54.4
+    ],
+    [
+     43.5,
+     54.4
+    ]
+   ],
+   "width": 2.6
+  },
+  {
+   "id": "S5",
+   "type": "escadas",
+   "rooms": [
+    "C",
+    "1"
+   ],
+   "floor": 0,
+   "note": "Do corredor sobe-se para a sala 1; a sala 1 não liga a nenhum mezanino (só pela 3 ou 4)",
+   "rect": [
+    51.5,
+    98.5,
+    3,
+    8
+   ],
+   "up": "N"
+  },
+  {
+   "id": "S6",
+   "type": "escadas",
+   "rooms": [
+    "C",
+    "7"
+   ],
+   "floor": 0,
+   "rect": [
+    0.5,
+    97.7,
+    3.2,
+    4.3
+   ],
+   "note": "Do corredor sobe-se para a Sala de Poses",
+   "up": "N"
+  },
+  {
+   "id": "S7",
+   "type": "escadas",
+   "rooms": [
+    "4",
+    "M4"
+   ],
+   "floor": 0,
+   "toFloor": 1,
+   "to": "M4",
+   "rect": [
+    40.4,
+    37.5,
+    1.8,
+    7.8
+   ],
+   "note": "Dentro da área da plataforma M4; sobe por baixo",
+   "up": "N"
+  },
+  {
+   "id": "P7",
+   "type": "passagem",
+   "rooms": [
+    "3",
+    "C"
+   ],
+   "floor": 0,
+   "wall": [
+    [
+     50,
+     103
+    ],
+    [
+     50,
+     107
+    ]
+   ],
+   "note": "Da sala 3 para o corredor por baixo da sala 1"
+  },
+  {
+   "id": "P8",
+   "type": "passagem",
+   "rooms": [
+    "C",
+    "1"
+   ],
+   "floor": 0,
+   "wall": [
+    [
+     51.5,
+     103
+    ],
+    [
+     54.5,
+     103
+    ]
+   ],
+   "note": "Abertura onde passam as escadas da sala 1"
+  },
+  {
+   "id": "P9",
+   "type": "passagem",
+   "rooms": [
+    "3",
+    "4"
+   ],
+   "floor": 0,
+   "wall": [
+    [
+     46.6,
+     53
+    ],
+    [
+     50,
+     53
+    ]
+   ],
+   "note": "Topo das escadas S4: entrada na sala 4"
+  }
+ ],
+ "outside": [
+  {
+   "id": "P",
+   "name": "Estacionamento",
+   "kind": "estacionamento",
+   "floor": 0,
+   "rect": [
+    4.5,
+    110,
+    62,
+    16
+   ],
+   "orientation": "perpendicular",
+   "rows": [
+    {
+     "y": 110,
+     "depth": 5,
+     "spaces": 24,
+     "side": "norte"
+    },
+    {
+     "y": 121,
+     "depth": 5,
+     "spaces": 24,
+     "side": "sul"
+    }
+   ],
+   "aisle": [
+    115,
+    121
+   ],
+   "note": "Ao longo da frente do ginásio, 4,5 m de margem de cada lado; lugares perpendiculares de 2,5 × 5 m, 24 de cada lado (48 no total)"
+  }
+ ],
+ "heights": {
+  "note": "As salas 5, 6 e 8 estão à mesma altura, acima da sala 4. A sala 2 é mais alta que a 4. A sala 4 é mais alta que a 3."
+ },
+ "functions": {
+  "1": "Cardio e máquinas seletorizadas",
+  "2": "Barras e bancos de supino (plano, inclinado, declinado), 2 hacks no fim, 1 press de ombro",
+  "3": "Máquinas de discos (plate loaded), 4 pares de filas com corredores",
+  "4": "Pesos livres debaixo do mezanino, grelha de 8 colunas por 6 filas: halteres, bancos, multipowers, smith, bases de powerlifting",
+  "8": "Sala 7: monolifts",
+  "6": "Pernas: gémeos, curls, extensões",
+  "5": "Glúteos",
+  "M4": "Mais glúteos (mezanino por cima da sala 4)",
+  "M3": "Cabos e polias: 5 filas (uma em cada canto e 3 ao meio) com 2 corredores",
+  "7": "Sala de Poses",
+  "C6": "Cave: máquinas de discos (parte da Sala 3)"
+ }
+}
